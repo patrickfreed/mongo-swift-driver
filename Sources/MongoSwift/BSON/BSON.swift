@@ -419,30 +419,21 @@ extension BSON: Hashable {}
 
 extension BSON: Codable {
     public init(from decoder: Decoder) throws {
-        if let bsonDecoder = decoder as? _BSONDecoder {
+        guard let bsonDecoder = decoder as? _BSONDecoder else {
             // This path only taken if a BSON is directly decoded at the top-level. Otherwise execution will never reach
             // this point.
-            self = try bsonDecoder.decodeBSON()
-        } else {
-            // This path is taken no matter what when a non-BSONDecoder is used.
-            for bsonType in BSON.allBSONTypes {
-                if let value = try? bsonType.init(from: decoder) {
-                    self = value.bson
-                }
-            }
-
-            throw DecodingError.typeMismatch(
-                BSON.self,
-                DecodingError.Context(
-                    codingPath: decoder.codingPath,
-                    debugDescription: "Encountered a value that could not be decoded to any BSON type"
-                )
-            )
+            throw getDecodingError(type: BSON.self, decoder: decoder)
         }
+
+        self = try bsonDecoder.decodeBSON()
     }
 
     public func encode(to encoder: Encoder) throws {
-        // This is only reached when a non-BSON encoder is used.
-        try self.bsonValue.encode(to: encoder)
+        let description = "Encoding a `BSON` instance with a non-BSONEncoder is currently unsupported"
+
+        throw EncodingError.invalidValue(
+            value,
+            EncodingError.Context(codingPath: encoder.codingPath, debugDescription: description)
+        )
     }
 }
