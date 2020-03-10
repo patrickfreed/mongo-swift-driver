@@ -420,9 +420,12 @@ extension BSON: Hashable {}
 extension BSON: Codable {
     public init(from decoder: Decoder) throws {
         guard let bsonDecoder = decoder as? _BSONDecoder else {
-            // This path only taken if a BSON is directly decoded at the top-level. Otherwise execution will never reach
-            // this point.
-            throw getDecodingError(type: BSON.self, decoder: decoder)
+            let description = "Initializing a `BSON` with a non-BSONDecoder is currently unsupported"
+
+            throw DecodingError.typeMismatch(
+                BSON.self,
+                DecodingError.Context(codingPath: decoder.codingPath, debugDescription: description)
+            )
         }
 
         self = try bsonDecoder.decodeBSON()
@@ -432,7 +435,7 @@ extension BSON: Codable {
         let description = "Encoding a `BSON` instance with a non-BSONEncoder is currently unsupported"
 
         throw EncodingError.invalidValue(
-            value,
+            self,
             EncodingError.Context(codingPath: encoder.codingPath, debugDescription: description)
         )
     }
