@@ -1235,12 +1235,12 @@ extension Data {
     /// Based on https://mjtsai.com/blog/2019/03/27/swift-5-released/
     fileprivate mutating func withUnsafeMutableCStringPointer<T>(body: (UnsafeMutablePointer<CChar>) throws -> T)
         rethrows -> T {
-        return try self.withUnsafeMutableBytes { (rawPtr: UnsafeMutableRawBufferPointer) in
-            let bufferPtr = rawPtr.bindMemory(to: CChar.self)
-            // baseAddress is non-nil as long as Data's count > 0.
-            // swiftlint:disable:next force_unwrapping
-            let bytesPtr = bufferPtr.baseAddress!
-            return try body(bytesPtr)
+            return try self.withUnsafeMutableBytes { (rawPtr: UnsafeMutableRawBufferPointer) in
+                let bufferPtr = rawPtr.bindMemory(to: CChar.self)
+                // baseAddress is non-nil as long as Data's count > 0.
+                // swiftlint:disable:next force_unwrapping
+                let bytesPtr = bufferPtr.baseAddress!
+                return try body(bytesPtr)
+            }
         }
-    }
 }

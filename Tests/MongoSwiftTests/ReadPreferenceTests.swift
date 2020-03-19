@@ -30,7 +30,7 @@ final class ReadPreferenceTests: MongoSwiftTestCase {
 
     func testTagSets() throws {
         let rpNoTagSets = try ReadPreference(.nearest, tagSets: nil)
-        expect(rpNoTagSets.tagSets).to(equal([]))
+        expect(rpNoTagSets.tagSets).to(beNil())
 
         let rpSomeTagSets = try ReadPreference(.nearest, tagSets: [["dc": "east"], [:]])
         expect(rpSomeTagSets.tagSets).to(equal([["dc": "east"], [:]]))
@@ -65,7 +65,7 @@ final class ReadPreferenceTests: MongoSwiftTestCase {
 
     func testInitFromPointer() {
         let rpOrig = ReadPreference(.primaryPreferred)
-        let rpCopy = ReadPreference(from: rpOrig._readPreference)
+        let rpCopy = ReadPreference(copying: rpOrig.pointer)
 
         expect(rpCopy).to(equal(rpOrig))
     }

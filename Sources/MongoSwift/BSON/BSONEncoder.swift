@@ -809,7 +809,7 @@ private class MutableDictionary: BSONValue {
     fileprivate func asDocument() -> Document {
         var doc = Document()
         for i in 0..<self.keys.count {
-            doc[keys[i]] = self.values[i].bson
+            doc[self.keys[i]] = self.values[i].bson
         }
         return doc
     }

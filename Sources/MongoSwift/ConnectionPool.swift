@@ -132,7 +132,7 @@ internal class ConnectionPool {
             guard let desc = mongoc_client_select_server(
                 conn.clientHandle,
                 forWrites,
-                readPreference?._readPreference,
+                readPreference?.pointer,
                 &error
             ) else {
                 throw extractMongoError(error: error)
