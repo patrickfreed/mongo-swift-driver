@@ -61,6 +61,10 @@ final class ReadPreferenceTests: MongoSwiftTestCase {
             .to(throwError(errorType: InvalidArgumentError.self))
         expect(try ReadPreference(.nearest, maxStalenessSeconds: 89))
             .to(throwError(errorType: InvalidArgumentError.self))
+
+        // maxStalenessSeconds cannot be used with .primary
+        expect(try ReadPreference(.primary, maxStalenessSeconds: 100))
+            .to(throwError(errorType: InvalidArgumentError.self))
     }
 
     func testInitFromPointer() {
