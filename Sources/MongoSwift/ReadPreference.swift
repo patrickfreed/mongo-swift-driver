@@ -124,6 +124,7 @@ extension ReadPreference: Equatable {
     }
 }
 
+/// A class wrapping a `mongoc_read_prefs_t`.
 private class MongocReadPreference {
     /// Pointer to underlying `mongoc_read_prefs_t`.
     fileprivate let readPref: OpaquePointer
