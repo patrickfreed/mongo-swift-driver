@@ -199,24 +199,24 @@ internal struct BulkWriteOperation<T: Codable>: Operation {
 
         let (serverId, isAcknowledged): (UInt32, Bool) =
             try self.collection.withMongocCollection(from: connection) { collPtr in
-                    guard let bulk = mongoc_collection_create_bulk_operation_with_opts(collPtr, opts?._bson) else {
-                        fatalError("failed to initialize mongoc_bulk_operation_t")
-                    }
-                    defer { mongoc_bulk_operation_destroy(bulk) }
-
-                    try self.models.enumerated().forEach { index, model in
-                        if let res = try model.addToBulkWrite(bulk, encoder: self.encoder) {
-                            insertedIds[index] = res
-                        }
-                    }
-
-                    let serverId = withMutableBSONPointer(to: &reply) { replyPtr in
-                        mongoc_bulk_operation_execute(bulk, replyPtr, &error)
-                    }
-
-                    let writeConcern = WriteConcern(from: mongoc_bulk_operation_get_write_concern(bulk))
-                    return (serverId, writeConcern.isAcknowledged)
+                guard let bulk = mongoc_collection_create_bulk_operation_with_opts(collPtr, opts?._bson) else {
+                    fatalError("failed to initialize mongoc_bulk_operation_t")
                 }
+                defer { mongoc_bulk_operation_destroy(bulk) }
+
+                try self.models.enumerated().forEach { index, model in
+                    if let res = try model.addToBulkWrite(bulk, encoder: self.encoder) {
+                        insertedIds[index] = res
+                    }
+                }
+
+                let serverId = withMutableBSONPointer(to: &reply) { replyPtr in
+                    mongoc_bulk_operation_execute(bulk, replyPtr, &error)
+                }
+
+                let writeConcern = WriteConcern(from: mongoc_bulk_operation_get_write_concern(bulk))
+                return (serverId, writeConcern.isAcknowledged)
+            }
 
         let result = try BulkWriteResult(reply: reply, insertedIds: insertedIds)
 
