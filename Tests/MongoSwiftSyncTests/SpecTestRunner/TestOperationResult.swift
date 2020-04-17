@@ -20,27 +20,31 @@ enum TestOperationResult: Decodable, Equatable, Matchable {
     /// Result of test operations that are expected to return an error (e.g. `CommandError`, `WriteError`).
     case error(ErrorResult)
 
-    public init?(from doc: Document?) {
-        guard let doc = doc else {
+    public init<T: Codable>(cursor: () throws -> MongoCursor<T>) throws {
+        let result = try cursor().all().map { BSON.document(try BSONEncoder().encode($0)) }
+        self = .array(result)
+    }
+
+    public init?(doc: () throws -> Document?) throws {
+        guard let doc = try doc() else {
             return nil
         }
         self = .document(doc)
     }
 
-    public init?(from result: BulkWriteResultConvertible?) {
-        guard let result = result else {
+    public init?<T: BulkWriteResultConvertible>(result: () throws -> T?) throws {
+        guard let result = try result() else {
             return nil
         }
         self = .bulkWrite(result.bulkResultValue)
     }
 
-    public init<T: Codable>(from cursor: MongoCursor<T>) throws {
-        let result = try cursor.all().map { BSON.document(try BSONEncoder().encode($0)) }
-        self = .array(result)
+    public init<T: Codable>(array: () throws -> [T]) throws {
+        self = .array(try array().map { .document(try BSONEncoder().encode($0)) })
     }
 
-    public init<T: Codable>(from array: [T]) throws {
-        self = try .array(array.map { .document(try BSONEncoder().encode($0)) })
+    public init(int: () throws -> Int) throws {
+        self = .int(try int())
     }
 
     public init(from decoder: Decoder) throws {
