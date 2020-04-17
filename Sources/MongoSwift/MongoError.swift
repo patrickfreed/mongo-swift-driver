@@ -15,6 +15,15 @@ public protocol LabeledError: MongoError {
     var errorLabels: [String]? { get }
 }
 
+extension LabeledError {
+    internal func containsErrorLabel(_ label: String) -> Bool {
+        guard let errorLabels = self.errorLabels else {
+            return false
+        }
+        return errorLabels.contains(label)
+    }
+}
+
 /// Protocol conformed to by errors returned from the MongoDB deployment.
 public protocol ServerError: LabeledError {}
 
@@ -513,28 +522,14 @@ internal func wrongIterTypeError(_ iter: DocumentIterator, expected type: BSONVa
     )
 }
 
-internal func isMaxTimeMSExpiredError(_ error: Error) -> Bool {
-    let maxTimeMSExpiredErrorCode = 50
-
-    if let commandError = error as? CommandError, commandError.code == maxTimeMSExpiredErrorCode {
-        return true
-    } else if let writeError = error as? WriteError {
-        if writeError.writeFailure?.code == maxTimeMSExpiredErrorCode ||
-            writeError.writeConcernFailure?.code == maxTimeMSExpiredErrorCode {
+private let MAX_TIME_MS_EXPIRED_ERROR_CODE = 50
+extension MongoError {
+    internal func isMaxTimeMSExpired() -> Bool {
+        guard let commandError = self as? CommandError else {
             return true
         }
-    } else if let bulkWriteError = error as? BulkWriteError {
-        if let writeFailures = bulkWriteError.writeFailures {
-            for writeFailure in writeFailures where writeFailure.code == maxTimeMSExpiredErrorCode {
-                return true
-            }
-        }
-        if bulkWriteError.writeConcernFailure?.code == maxTimeMSExpiredErrorCode {
-            return true
-        }
+        return commandError.code == MAX_TIME_MS_EXPIRED_ERROR_CODE
     }
-
-    return false
 }
 
 internal let failedToRetrieveCursorMessage = "Couldn't get cursor from the server"
