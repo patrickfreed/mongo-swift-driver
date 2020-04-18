@@ -1,7 +1,11 @@
 import MongoSwiftSync
 
 struct StartTransaction: TestOperation {
-    let options: TransactionOptions? = nil
+    let options: TransactionOptions?
+
+    init() {
+        self.options = nil
+    }
 
     func execute(on session: ClientSession) throws -> TestOperationResult? {
         try session.startTransaction(options: self.options)

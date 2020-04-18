@@ -197,6 +197,8 @@ struct ErrorResult: Equatable, Decodable {
 
     internal func checkErrorContains(_ error: Error) throws {
         if let errorContains = self.errorContains?.lowercased() {
+            // TODO: SWIFT-769 Once localizedDescriptions for the errors are fixed, we can remove
+            // most of this switching.
             if let commandError = error as? CommandError {
                 expect(commandError.message.lowercased()).to(contain(errorContains))
             } else if let writeError = error as? WriteError {
@@ -257,16 +259,12 @@ struct ErrorResult: Equatable, Decodable {
     }
 
     internal func checkErrorLabels(_ error: Error) throws {
-        // `configureFailPoint` command correctly handles error labels in MongoDB v4.3.1+ (see SERVER-43941).
-        // Do not check the "RetryableWriteError" error label until the spec test requirements are updated.
-        let skippedErrorLabels = ["RetryableWriteError"]
-
         if let errorLabelsContain = self.errorLabelsContain {
             guard let labeledError = error as? LabeledError else {
                 XCTFail("\(error) does not contain errorLabels")
                 return
             }
-            for label in errorLabelsContain where !skippedErrorLabels.contains(label) {
+            for label in errorLabelsContain {
                 expect(labeledError.errorLabels).to(contain(label))
             }
         }

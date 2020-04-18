@@ -250,7 +250,7 @@ struct InsertOne: TestOperation {
         sessions: [String: ClientSession]
     ) throws -> TestOperationResult? {
         try TestOperationResult {
-            try collection.insertOne(self.document, session: sessions[self.session ?? ""])
+            try collection.insertOne(self.document, session: self.getSession(from: sessions))
         }
     }
 }
@@ -346,7 +346,7 @@ struct BulkWrite: TestOperation {
         sessions: [String: ClientSession]
     ) throws -> TestOperationResult? {
         try TestOperationResult {
-            try collection.bulkWrite(self.requests, options: self.options, session: sessions[self.session ?? ""])
+            try collection.bulkWrite(self.requests, options: self.options, session: self.getSession(from: sessions))
         }
     }
 }

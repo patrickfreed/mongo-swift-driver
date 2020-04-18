@@ -31,7 +31,7 @@ struct AssertIndexExists: TestOperation {
     let collection: String
     let index: String
 
-    func execute<T: SpecTest>(on runner: inout T, sessions _: [String: ClientSession]) throws -> TestOperationResult? {
+    func execute<T: SpecTest>(on _: inout T, sessions _: [String: ClientSession]) throws -> TestOperationResult? {
         let client = try MongoClient.makeTestClient()
         let indexNames = try client.db(self.database).collection(self.collection).listIndexNames()
         expect(indexNames).to(contain(self.index))
@@ -44,7 +44,7 @@ struct AssertIndexNotExists: TestOperation {
     let collection: String
     let index: String
 
-    func execute<T: SpecTest>(on runner: inout T, sessions _: [String: ClientSession]) throws -> TestOperationResult? {
+    func execute<T: SpecTest>(on _: inout T, sessions _: [String: ClientSession]) throws -> TestOperationResult? {
         let client = try MongoClient.makeTestClient()
         let indexNames = try client.db(self.database).collection(self.collection).listIndexNames()
         expect(indexNames).toNot(contain(self.index))
@@ -94,11 +94,10 @@ struct TargetedFailPoint: TestOperation {
     let failPoint: FailPoint
 
     func execute<T: SpecTest>(on runner: inout T, sessions: [String: ClientSession]) throws -> TestOperationResult? {
-        guard let session = sessions[self.session], let server = session.serverId else {
+        guard let session = sessions[self.session], let server = session.pinnedServerAddress else {
             throw TestError(message: "could not get session or session not pinned to mongos")
         }
-        try runner.activateFailPoint(self.failPoint, onServer: server)
-        print("targeted failpoint \(String(describing: runner.activeFailPoint))")
+        try runner.activateFailPoint(self.failPoint, on: server)
         return nil
     }
 }

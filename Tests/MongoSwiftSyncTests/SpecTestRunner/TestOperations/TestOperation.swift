@@ -2,6 +2,64 @@ import MongoSwiftSync
 import Nimble
 import TestsCommon
 
+/// Protocol describing the behavior of a spec test "operation"
+protocol TestOperation: Decodable {
+    func execute(on client: MongoClient, sessions: [String: ClientSession]) throws -> TestOperationResult?
+
+    func execute(on database: MongoDatabase, sessions: [String: ClientSession]) throws -> TestOperationResult?
+
+    func execute(
+        on collection: MongoCollection<Document>,
+        sessions: [String: ClientSession]
+    ) throws -> TestOperationResult?
+
+    func execute(on session: ClientSession) throws -> TestOperationResult?
+
+    func execute<T: SpecTest>(on runner: inout T, sessions: [String: ClientSession]) throws -> TestOperationResult?
+
+    /// The name of the session this operation should execute against, if any.
+    var session: String? { get }
+}
+
+extension TestOperation {
+    func execute(on _: MongoClient, sessions _: [String: ClientSession]) throws -> TestOperationResult? {
+        throw TestError(message: "\(type(of: self)) cannot execute on a client")
+    }
+
+    func execute(on _: MongoDatabase, sessions _: [String: ClientSession]) throws -> TestOperationResult? {
+        throw TestError(message: "\(type(of: self)) cannot execute on a database")
+    }
+
+    func execute(
+        on _: MongoCollection<Document>,
+        sessions _: [String: ClientSession]
+    ) throws -> TestOperationResult? {
+        throw TestError(message: "\(type(of: self)) cannot execute on a collection")
+    }
+
+    func execute(on _: ClientSession) throws -> TestOperationResult? {
+        throw TestError(message: "\(type(of: self)) cannot execute on a session")
+    }
+
+    func execute<T: SpecTest>(on _: inout T, sessions _: [String: ClientSession]) throws -> TestOperationResult? {
+        throw TestError(message: "\(type(of: self)) cannot execute on a test runner")
+    }
+
+    var session: String? { nil }
+
+    func getSession(from sessions: [String: ClientSession]) throws -> ClientSession? {
+        guard let sessionName = self.session else {
+            return nil
+        }
+
+        guard let session = sessions[sessionName] else {
+            throw TestError(message: "\(sessionName) not included in sessions map \(sessions)")
+        }
+
+        return session
+    }
+}
+
 /// A enumeration of the different objects a `TestOperation` may be performed against.
 enum TestOperationObject: Decodable {
     case client
@@ -123,49 +181,7 @@ struct TestOperationDescription: Decodable {
             }
         }
     }
-
     // swiftlint:enable cyclomatic_complexity
-}
-
-/// Protocol describing the behavior of a spec test "operation"
-protocol TestOperation: Decodable {
-    func execute(on client: MongoClient, sessions: [String: ClientSession]) throws -> TestOperationResult?
-
-    func execute(on database: MongoDatabase, sessions: [String: ClientSession]) throws -> TestOperationResult?
-
-    func execute(
-        on collection: MongoCollection<Document>,
-        sessions: [String: ClientSession]
-    ) throws -> TestOperationResult?
-
-    func execute(on session: ClientSession) throws -> TestOperationResult?
-
-    func execute<T: SpecTest>(on runner: inout T, sessions: [String: ClientSession]) throws -> TestOperationResult?
-}
-
-extension TestOperation {
-    func execute(on _: MongoClient, sessions _: [String: ClientSession]) throws -> TestOperationResult? {
-        throw TestError(message: "\(type(of: self)) cannot execute on a client")
-    }
-
-    func execute(on _: MongoDatabase, sessions _: [String: ClientSession]) throws -> TestOperationResult? {
-        throw TestError(message: "\(type(of: self)) cannot execute on a database")
-    }
-
-    func execute(
-        on _: MongoCollection<Document>,
-        sessions _: [String: ClientSession]
-    ) throws -> TestOperationResult? {
-        throw TestError(message: "\(type(of: self)) cannot execute on a collection")
-    }
-
-    func execute(on _: ClientSession) throws -> TestOperationResult? {
-        throw TestError(message: "\(type(of: self)) cannot execute on a session")
-    }
-
-    func execute<T: SpecTest>(on _: inout T, sessions _: [String: ClientSession]) throws -> TestOperationResult? {
-        throw TestError(message: "\(type(of: self)) cannot execute on a test runner")
-    }
 }
 
 /// Wrapper around a `TestOperation.swift` allowing it to be decoded from a spec test.
