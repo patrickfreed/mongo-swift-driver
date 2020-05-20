@@ -1,4 +1,5 @@
 import Foundation
+import class MongoSwift.MongoClient
 @testable import class MongoSwift.ClientSession
 @testable import MongoSwiftSync
 import TestsCommon
@@ -204,4 +205,6 @@ extension MongoSwiftSync.ClientSession {
     internal var transactionState: TransactionState? { self.asyncSession.transactionState }
 
     internal var isPinned: Bool { self.pinnedServerAddress != nil }
+
+    internal var asyncClient: MongoSwift.ClientSession { self.asyncSession }
 }

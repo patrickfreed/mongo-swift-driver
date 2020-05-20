@@ -522,13 +522,13 @@ internal func wrongIterTypeError(_ iter: DocumentIterator, expected type: BSONVa
     )
 }
 
-private let MAX_TIME_MS_EXPIRED_ERROR_CODE = 50
+private let maxTimeMSExpiredErrorCode = 50
 extension MongoError {
     internal func isMaxTimeMSExpired() -> Bool {
         guard let commandError = self as? CommandError else {
             return true
         }
-        return commandError.code == MAX_TIME_MS_EXPIRED_ERROR_CODE
+        return commandError.code == maxTimeMSExpiredErrorCode
     }
 }
 

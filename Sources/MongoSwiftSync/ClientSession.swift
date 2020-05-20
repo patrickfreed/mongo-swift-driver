@@ -146,4 +146,14 @@ public final class ClientSession {
     public func abortTransaction() throws {
         try self.asyncSession.abortTransaction().wait()
     }
+
+    public func withTransaction<T>(
+      options: TransactionOptions? = nil,
+      transactionBody: @escaping () throws -> T
+    ) throws -> T {
+        let asyncBody = {
+            self.asyncSession.client.watch(pipeline: [Document], options: ChangeStreamOptions?, session: ClientSession?)
+        }
+        try self.asyncSession.withTransaction(options: options, transactionBody: transactionBody).wait()
+    }
 }

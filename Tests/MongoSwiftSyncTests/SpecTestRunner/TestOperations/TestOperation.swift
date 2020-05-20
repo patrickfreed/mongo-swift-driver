@@ -13,7 +13,7 @@ protocol TestOperation: Decodable {
         sessions: [String: ClientSession]
     ) throws -> TestOperationResult?
 
-    func execute(on session: ClientSession) throws -> TestOperationResult?
+    func execute(on _: ClientSession, context: TestOperationExecutionContext) throws -> TestOperationResult?
 
     func execute<T: SpecTest>(on runner: inout T, sessions: [String: ClientSession]) throws -> TestOperationResult?
 }
@@ -34,13 +34,21 @@ extension TestOperation {
         throw TestError(message: "\(type(of: self)) cannot execute on a collection")
     }
 
-    func execute(on _: ClientSession) throws -> TestOperationResult? {
+    func execute(on _: ClientSession, context: TestOperationExecutionContext) throws -> TestOperationResult? {
         throw TestError(message: "\(type(of: self)) cannot execute on a session")
     }
 
     func execute<T: SpecTest>(on _: inout T, sessions _: [String: ClientSession]) throws -> TestOperationResult? {
         throw TestError(message: "\(type(of: self)) cannot execute on a test runner")
     }
+}
+
+/// The full context in which an operation was executed.
+/// This is passed to operations executed on a session to allow further operations to be executed with the session.
+struct TestOperationExecutionContext {
+    let database: MongoDatabase
+    let collection: MongoCollection<Document>?
+    let sessions: [String: ClientSession]
 }
 
 /// A enumeration of the different objects a `TestOperation` may be performed against.
@@ -147,7 +155,12 @@ struct TestOperationDescription: Decodable {
                 guard let session = sessions[sessionName] else {
                     throw TestError(message: "got session object but was not provided a session")
                 }
-                result = try self.operation.op.execute(on: session)
+                let context = TestOperationExecutionContext(
+                  database: database,
+                  collection: collection,
+                  sessions: sessions
+                )
+                result = try self.operation.op.execute(on: session, context: context)
             case .testRunner:
                 result = try self.operation.op.execute(on: &test, sessions: sessions)
             case .gridfsbucket:
