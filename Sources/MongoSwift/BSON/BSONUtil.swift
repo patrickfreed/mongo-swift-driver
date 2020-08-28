@@ -72,7 +72,6 @@ extension BSONEncoder {
         self.uuidEncodingStrategy = options?.uuidCodingStrategy?.rawValue.encoding ?? self.uuidEncodingStrategy
         self.dataEncodingStrategy = options?.dataCodingStrategy?.rawValue.encoding ?? self.dataEncodingStrategy
     }
-
 }
 
 extension Date {

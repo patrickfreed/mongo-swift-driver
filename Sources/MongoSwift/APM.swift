@@ -148,7 +148,7 @@ public struct CommandStartedEvent: MongoSwiftEvent, CommandEventProtocol {
     fileprivate init(mongocEvent: MongocCommandStartedEvent) {
         // we have to copy because libmongoc owns the pointer.
         // document should be formatted correctly since it is coming from mongoc.
-        // swiftlint:disable:next force_unwrap
+        // swiftlint:disable:next force_try
         self.command = try! BSONDocument(copying: mongoc_apm_command_started_get_command(mongocEvent.ptr))
         self.databaseName = String(cString: mongoc_apm_command_started_get_database_name(mongocEvent.ptr))
         self.commandName = String(cString: mongoc_apm_command_started_get_command_name(mongocEvent.ptr))
@@ -203,7 +203,7 @@ public struct CommandSucceededEvent: MongoSwiftEvent, CommandEventProtocol {
         self.duration = Int(mongoc_apm_command_succeeded_get_duration(mongocEvent.ptr))
         // we have to copy because libmongoc owns the pointer.
         // document should be formatted correctly since it is coming from mongoc.
-        // swiftlint:disable:next force_unwrap
+        // swiftlint:disable:next force_try
         self.reply = try! BSONDocument(copying: mongoc_apm_command_succeeded_get_reply(mongocEvent.ptr))
         self.commandName = String(cString: mongoc_apm_command_succeeded_get_command_name(mongocEvent.ptr))
         self.requestID = mongoc_apm_command_succeeded_get_request_id(mongocEvent.ptr)
@@ -258,7 +258,7 @@ public struct CommandFailedEvent: MongoSwiftEvent, CommandEventProtocol {
         var error = bson_error_t()
         mongoc_apm_command_failed_get_error(mongocEvent.ptr, &error)
         // document should be formatted correctly since it is coming from mongoc.
-        // swiftlint:disable:next force_unwrap
+        // swiftlint:disable:next force_try
         let reply = try! BSONDocument(copying: mongoc_apm_command_failed_get_reply(mongocEvent.ptr))
         self.failure = extractMongoError(error: error, reply: reply) // should always return a CommandError
         self.requestID = mongoc_apm_command_failed_get_request_id(mongocEvent.ptr)
@@ -600,7 +600,7 @@ public struct ServerHeartbeatSucceededEvent: MongoSwiftEvent {
         self.duration = Int(mongoc_apm_server_heartbeat_succeeded_get_duration(mongocEvent.ptr))
         // we have to copy because libmongoc owns the pointer.
         // document should be formatted correctly since it is coming from mongoc.
-        // swiftlint:disable:next force_unwrap
+        // swiftlint:disable:next force_try
         self.reply = try! BSONDocument(copying: mongoc_apm_server_heartbeat_succeeded_get_reply(mongocEvent.ptr))
         self.serverAddress = ServerAddress(mongoc_apm_server_heartbeat_succeeded_get_host(mongocEvent.ptr))
     }

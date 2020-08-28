@@ -227,8 +227,9 @@ public final class ClientSession {
                         self.advanceClusterTime(to: clusterTime)
                     }
 
+                    // mongoc_client_session_get_lsid never returns nil
                     // swiftlint:disable:next force_unwrapping
-                    self.id = try BSONDocument(copying: mongoc_client_session_get_lsid(sessionPtr)!) // never returns nil
+                    self.id = try BSONDocument(copying: mongoc_client_session_get_lsid(sessionPtr)!)
                 }
         case .started:
             return self.client.operationExecutor.makeSucceededFuture(())

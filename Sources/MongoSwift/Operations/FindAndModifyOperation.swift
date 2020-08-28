@@ -78,9 +78,9 @@ internal class FindAndModifyOptions {
         if let filters = arrayFilters {
             extra["arrayFilters"] = .array(filters.map { .document($0) })
         }
-        if let coll = collation { 
+        if let coll = collation {
             extra["collation"] = .document(coll)
-        } 
+        }
 
         // note: mongoc_find_and_modify_opts_set_max_time_ms() takes in a
         // uint32_t, but it should be a positive 64-bit integer, so we

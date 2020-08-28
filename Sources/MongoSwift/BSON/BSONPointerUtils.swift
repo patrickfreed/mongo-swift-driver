@@ -61,7 +61,7 @@ extension SwiftBSON.BSONDocument {
      *
      * - Returns: a new `BSONDocument`
      */
-    internal init(_ elements: [SwiftBSON.BSON]) {
+    internal init(_: [SwiftBSON.BSON]) {
         // self._storage = Storage()
         // for (i, elt) in elements.enumerated() {
         //     do {
@@ -70,7 +70,7 @@ extension SwiftBSON.BSONDocument {
         //         fatalError("Failed to set the value for index \(i) to \(String(describing: elt)): \(error)")
         //     }
         // }
-        fatalError("")
+        fatalError("todo")
     }
 }
 
@@ -91,7 +91,7 @@ internal func withOptionalBSONPointer<T>(
 }
 
 extension BSONObjectID {
-    internal init(bsonOid: bson_oid_t) {
-        fatalError()
+    internal init(bsonOid _: bson_oid_t) {
+        fatalError("todo")
     }
 }

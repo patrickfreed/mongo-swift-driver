@@ -1,4 +1,3 @@
-
 /// Describes the modes for configuring the fullDocument field of a change stream document.
 public struct FullDocument: RawRepresentable, Codable {
     /// Specifies that the `fullDocument` field of an update event will contain a copy of the entire document that

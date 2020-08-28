@@ -156,11 +156,9 @@ public struct ServerDescription {
 
         // initialize the rest of the values from the isMaster response.
         // we have to copy because libmongoc owns the pointer.
-        // libmongoc should only give us properly formatted BSON
-        // swiftling:disable:next force_unwrap
-        let isMasterDoc = try! BSONDocument(copying: mongoc_server_description_ismaster(description))
         // TODO: SWIFT-349 log errors encountered here
-        let isMaster = try? BSONDecoder().decode(IsMasterResponse.self, from: isMasterDoc)
+        let isMasterDoc = try? BSONDocument(copying: mongoc_server_description_ismaster(description))
+        let isMaster = isMasterDoc.flatMap { try? BSONDecoder().decode(IsMasterResponse.self, from: $0) }
 
         self.lastWriteDate = isMaster?.lastWrite?.lastWriteDate
         self.minWireVersion = isMaster?.minWireVersion ?? 0
