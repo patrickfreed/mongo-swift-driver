@@ -1,6 +1,5 @@
 import CLibMongoC
 import NIO
-import SwiftBSON
 
 /// Options to set on a retrieved `MongoCollection`.
 public struct MongoCollectionOptions: CodingStrategyProvider {

@@ -1,5 +1,4 @@
 import CLibMongoC
-import SwiftBSON
 
 /// An operation corresponding to a "drop" command on a database.
 internal struct DropDatabaseOperation: Operation {

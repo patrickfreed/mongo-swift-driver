@@ -1,6 +1,5 @@
 import CLibMongoC
 import Foundation
-import SwiftBSON
 
 /// An empty protocol for encapsulating all errors that this package can throw.
 public protocol MongoErrorProtocol: LocalizedError {}

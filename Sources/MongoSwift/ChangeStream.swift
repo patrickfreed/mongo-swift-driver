@@ -1,7 +1,6 @@
 import CLibMongoC
 import Foundation
 import NIO
-import SwiftBSON
 
 /// Direct wrapper of a `mongoc_change_stream_t`.
 private struct MongocChangeStream: MongocCursorWrapper {

@@ -1,6 +1,5 @@
 import CLibMongoC
 import NIO
-import SwiftBSON
 
 /// A struct representing an index on a `MongoCollection`.
 public struct IndexModel: Codable {

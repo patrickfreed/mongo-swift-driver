@@ -1,5 +1,4 @@
 import CLibMongoC
-import SwiftBSON
 
 /// Represents a MongoDB read preference, indicating which member(s) of a replica set read operations should be
 /// directed to.

@@ -1,6 +1,5 @@
 import CLibMongoC
 import Foundation
-import SwiftBSON
 
 /// A struct representing a network address, consisting of a host and port.
 public struct ServerAddress: Equatable {

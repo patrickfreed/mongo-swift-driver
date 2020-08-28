@@ -2,7 +2,6 @@ import CLibMongoC
 import Foundation
 import NIO
 import NIOConcurrencyHelpers
-import SwiftBSON
 
 /// Options to use when creating a `MongoClient`.
 public struct MongoClientOptions: CodingStrategyProvider {

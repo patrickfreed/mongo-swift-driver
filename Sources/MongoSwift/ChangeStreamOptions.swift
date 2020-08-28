@@ -1,4 +1,3 @@
-import SwiftBSON
 
 /// Describes the modes for configuring the fullDocument field of a change stream document.
 public struct FullDocument: RawRepresentable, Codable {

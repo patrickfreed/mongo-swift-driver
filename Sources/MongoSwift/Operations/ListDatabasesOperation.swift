@@ -1,5 +1,4 @@
 import CLibMongoC
-import SwiftBSON
 
 /// A struct modeling the information returned from the `listDatabases` command about a single database.
 public struct DatabaseSpecification: Codable {

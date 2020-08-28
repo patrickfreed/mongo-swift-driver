@@ -1,5 +1,4 @@
 import Foundation
-import SwiftBSON
 
 /// Protocol indicating a set of options can be used to configure `BSONEncoder` and `BSONDecoder`.
 public protocol CodingStrategyProvider {

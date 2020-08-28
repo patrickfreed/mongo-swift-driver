@@ -1,6 +1,5 @@
 import CLibMongoC
 import Foundation
-import SwiftBSON
 
 /// A protocol for `CommandEvent` handlers to implement.
 public protocol CommandEventHandler: AnyObject {

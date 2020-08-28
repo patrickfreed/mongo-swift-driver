@@ -1,5 +1,4 @@
 import CLibMongoC
-import SwiftBSON
 
 /// Executes the provided closure using a stack-allocated, uninitialized, mutable bson_t. The bson_t is only valid for
 /// the body of the closure and must be copied if you wish to use it later on. The closure *must* initialize the

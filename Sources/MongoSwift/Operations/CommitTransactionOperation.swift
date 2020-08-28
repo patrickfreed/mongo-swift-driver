@@ -1,5 +1,4 @@
 import CLibMongoC
-import SwiftBSON
 
 /// An operation corresponding to committing a transaction.
 internal struct CommitTransactionOperation: Operation {

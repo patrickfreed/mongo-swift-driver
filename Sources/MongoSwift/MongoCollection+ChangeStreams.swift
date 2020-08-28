@@ -1,6 +1,5 @@
 import CLibMongoC
 import NIO
-import SwiftBSON
 
 extension MongoCollection {
     /**

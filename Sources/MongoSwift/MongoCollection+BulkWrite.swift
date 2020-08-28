@@ -1,6 +1,5 @@
 import CLibMongoC
 import NIO
-import SwiftBSON
 
 /// An extension of `MongoCollection` encapsulating bulk write operations.
 extension MongoCollection {

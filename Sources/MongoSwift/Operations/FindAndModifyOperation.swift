@@ -1,5 +1,4 @@
 import CLibMongoC
-import SwiftBSON
 
 /// A class wrapping a `mongoc_find_and_modify_opts_t`, for use with `MongoCollection.findAndModify`.
 internal class FindAndModifyOptions {

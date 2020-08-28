@@ -1,5 +1,4 @@
 import NIO
-import SwiftBSON
 
 /// A protocol for operation types to conform to. An `Operation` instance corresponds to any single operation a user
 /// can perform with the driver's API that requires I/O.

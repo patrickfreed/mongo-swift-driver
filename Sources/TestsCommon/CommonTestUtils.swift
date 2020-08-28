@@ -3,7 +3,6 @@ import Foundation
 @testable import MongoSwift
 import Nimble
 import XCTest
-import SwiftBSON
 
 extension String {
     /// Removes the first occurrence of the specified substring from the string. If the substring is not present, has

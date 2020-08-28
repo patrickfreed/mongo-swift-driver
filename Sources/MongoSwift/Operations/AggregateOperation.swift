@@ -1,6 +1,5 @@
 import CLibMongoC
 import Foundation
-import SwiftBSON
 
 /// Options to use when executing an `aggregate` command on a `MongoCollection`.
 public struct AggregateOptions: Codable {

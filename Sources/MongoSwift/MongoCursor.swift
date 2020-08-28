@@ -2,7 +2,6 @@ import CLibMongoC
 import Foundation
 import NIO
 import NIOConcurrencyHelpers
-import SwiftBSON
 
 /// Direct wrapper of a `mongoc_cursor_t`.
 internal struct MongocCursor: MongocCursorWrapper {

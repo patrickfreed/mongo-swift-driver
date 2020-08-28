@@ -1,5 +1,4 @@
 import CLibMongoC
-import SwiftBSON
 
 /// Options to use when executing a `countDocuments` command on a `MongoCollection`.
 public struct CountDocumentsOptions: Codable {

@@ -1,7 +1,6 @@
 import CLibMongoC
 import Foundation
 import NIO
-import SwiftBSON
 
 // sourcery: skipSyncExport
 /**
