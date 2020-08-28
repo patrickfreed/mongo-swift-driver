@@ -1,6 +1,9 @@
 import CLibMongoC
 import Foundation
-import struct SwiftBSON.BSONDocument
+import SwiftBSON
+
+internal typealias BSONPointer = UnsafePointer<bson_t>
+internal typealias MutableBSONPointer = UnsafeMutablePointer<bson_t>
 
 extension SwiftBSON.BSONDocument {
     /// Executes the given closure with a read-only, stack-allocated pointer to a bson_t.
@@ -85,5 +88,11 @@ internal func withOptionalBSONPointer<T>(
     guard let doc = document else {
         return try body(nil)
     }
-    return try doc.withBSONPointer(body: body)
+    return try doc.withBSONPointer(body)
+}
+
+extension BSONObjectID {
+    internal init(bsonOid: bson_oid_t) {
+        fatalError()
+    }
 }

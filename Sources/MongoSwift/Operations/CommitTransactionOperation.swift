@@ -1,4 +1,5 @@
 import CLibMongoC
+import SwiftBSON
 
 /// An operation corresponding to committing a transaction.
 internal struct CommitTransactionOperation: Operation {
@@ -11,7 +12,7 @@ internal struct CommitTransactionOperation: Operation {
             try withStackAllocatedMutableBSONPointer { replyPtr in
                 var error = bson_error_t()
                 guard mongoc_client_session_commit_transaction(sessionPtr, replyPtr, &error) else {
-                    throw extractMongoError(error: error, reply: BSONDocument(copying: replyPtr))
+                    throw extractMongoError(error: error, reply: try BSONDocument(copying: replyPtr))
                 }
             }
         }

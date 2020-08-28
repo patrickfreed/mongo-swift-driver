@@ -1,4 +1,5 @@
 import CLibMongoC
+import SwiftBSON
 
 /// A struct to represent a MongoDB read concern.
 public struct ReadConcern: Codable {

@@ -1,4 +1,5 @@
 import CLibMongoC
+import SwiftBSON
 
 /// A class wrapping a `mongoc_find_and_modify_opts_t`, for use with `MongoCollection.findAndModify`.
 internal class FindAndModifyOptions {
@@ -76,13 +77,11 @@ internal class FindAndModifyOptions {
         // build an "extra" document of fields without their own setters
         var extra = BSONDocument()
         if let filters = arrayFilters {
-            try convertingBSONErrors {
-                try extra.setValue(for: "arrayFilters", to: .array(filters.map { .document($0) }))
-            }
+            extra["arrayFilters"] = .array(filters.map { .document($0) })
         }
-        if let coll = collation { try convertingBSONErrors {
-            try extra.setValue(for: "collation", to: .document(coll))
-        } }
+        if let coll = collation { 
+            extra["collation"] = .document(coll)
+        } 
 
         // note: mongoc_find_and_modify_opts_set_max_time_ms() takes in a
         // uint32_t, but it should be a positive 64-bit integer, so we
@@ -91,17 +90,11 @@ internal class FindAndModifyOptions {
             guard maxTime > 0 else {
                 throw MongoError.InvalidArgumentError(message: "maxTimeMS must be positive, but got value \(maxTime)")
             }
-            try convertingBSONErrors {
-                try extra.setValue(for: "maxTimeMS", to: .int64(Int64(maxTime)))
-            }
+            extra["maxTimeMS"] = .int64(Int64(maxTime))
         }
 
         if let wc = writeConcern {
-            do {
-                try extra.setValue(for: "writeConcern", to: .document(try BSONEncoder().encode(wc)))
-            } catch {
-                throw MongoError.InternalError(message: "Error encoding WriteConcern \(wc): \(error)")
-            }
+            extra["writeConcern"] = .document(try BSONEncoder().encode(wc))
         }
 
         if !extra.isEmpty {
@@ -171,11 +164,11 @@ internal struct FindAndModifyOperation<T: Codable>: Operation {
 
         var error = bson_error_t()
 
-        let (success, reply) = self.collection
+        let (success, reply) = try self.collection
             .withMongocCollection(from: connection) { collPtr -> (Bool, BSONDocument) in
-                self.filter.withBSONPointer { filterPtr in
-                    opts.withMongocOptions { optsPtr in
-                        withStackAllocatedMutableBSONPointer { replyPtr in
+                try self.filter.withBSONPointer { filterPtr in
+                    try opts.withMongocOptions { optsPtr in
+                        try withStackAllocatedMutableBSONPointer { replyPtr in
                             let success = mongoc_collection_find_and_modify_with_opts(
                                 collPtr,
                                 filterPtr,
@@ -183,7 +176,7 @@ internal struct FindAndModifyOperation<T: Codable>: Operation {
                                 replyPtr,
                                 &error
                             )
-                            return (success, BSONDocument(copying: replyPtr))
+                            return (success, try BSONDocument(copying: replyPtr))
                         }
                     }
                 }
@@ -193,7 +186,7 @@ internal struct FindAndModifyOperation<T: Codable>: Operation {
             throw extractMongoError(error: error, reply: reply)
         }
 
-        guard let value = try reply.getValue(for: "value")?.documentValue else {
+        guard let value = reply["value"]?.documentValue else {
             return nil
         }
 

@@ -1,5 +1,6 @@
 import CLibMongoC
 import NIO
+import SwiftBSON
 
 /// An extension of `MongoCollection` encapsulating read operations.
 extension MongoCollection {

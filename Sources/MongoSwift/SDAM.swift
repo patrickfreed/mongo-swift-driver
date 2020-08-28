@@ -1,5 +1,6 @@
 import CLibMongoC
 import Foundation
+import SwiftBSON
 
 /// A struct representing a network address, consisting of a host and port.
 public struct ServerAddress: Equatable {
@@ -156,7 +157,9 @@ public struct ServerDescription {
 
         // initialize the rest of the values from the isMaster response.
         // we have to copy because libmongoc owns the pointer.
-        let isMasterDoc = BSONDocument(copying: mongoc_server_description_ismaster(description))
+        // libmongoc should only give us properly formatted BSON
+        // swiftling:disable:next force_unwrap
+        let isMasterDoc = try! BSONDocument(copying: mongoc_server_description_ismaster(description))
         // TODO: SWIFT-349 log errors encountered here
         let isMaster = try? BSONDecoder().decode(IsMasterResponse.self, from: isMasterDoc)
 

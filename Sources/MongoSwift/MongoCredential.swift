@@ -1,3 +1,5 @@
+import SwiftBSON
+
 /// Represents an authentication credential.
 public struct MongoCredential: Decodable, Equatable {
     /// A string containing the username. For auth mechanisms that do not utilize a password, this may be the entire

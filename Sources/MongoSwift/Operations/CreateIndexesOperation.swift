@@ -1,4 +1,5 @@
 import CLibMongoC
+import SwiftBSON
 
 /// Options to use when creating a new index on a `MongoCollection`.
 public struct CreateIndexOptions: Encodable {

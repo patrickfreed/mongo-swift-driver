@@ -1,4 +1,5 @@
 import CLibMongoC
+import SwiftBSON
 
 /// Options to use when executing a `distinct` command on a `MongoCollection`.
 public struct DistinctOptions: Codable {
@@ -65,9 +66,7 @@ internal struct DistinctOperation<T: Codable>: Operation {
             }
         }
 
-        guard let values = (try convertingBSONErrors {
-            try reply.getValue(for: "values")?.arrayValue
-        }) else {
+        guard let values = reply["values"]?.arrayValue else {
             throw MongoError.InternalError(
                 message:
                 "expected server reply \(reply) to contain an array of distinct values"

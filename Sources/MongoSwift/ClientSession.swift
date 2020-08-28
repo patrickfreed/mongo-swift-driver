@@ -1,6 +1,7 @@
 import CLibMongoC
 import Foundation
 import NIO
+import SwiftBSON
 
 // sourcery: skipSyncExport
 /**
@@ -172,7 +173,7 @@ public final class ClientSession {
             guard let time = mongoc_client_session_get_cluster_time(session) else {
                 return nil
             }
-            return BSONDocument(copying: time)
+            return try? BSONDocument(copying: time)
         case .ended:
             return nil
         }
@@ -217,7 +218,7 @@ public final class ClientSession {
         case let .notStarted(opTime, clusterTime):
             let operation = StartSessionOperation(session: self)
             return self.client.operationExecutor.execute(operation, client: self.client, session: nil)
-                .map { sessionPtr, connection in
+                .flatMapThrowing { sessionPtr, connection in
                     self.state = .started(session: sessionPtr, connection: connection)
                     // if we cached opTime or clusterTime, set them now
                     if let opTime = opTime {
@@ -228,7 +229,7 @@ public final class ClientSession {
                     }
 
                     // swiftlint:disable:next force_unwrapping
-                    self.id = BSONDocument(copying: mongoc_client_session_get_lsid(sessionPtr)!) // never returns nil
+                    self.id = try BSONDocument(copying: mongoc_client_session_get_lsid(sessionPtr)!) // never returns nil
                 }
         case .started:
             return self.client.operationExecutor.makeSucceededFuture(())
@@ -342,7 +343,7 @@ public final class ClientSession {
             throw extractMongoError(error: error)
         }
 
-        let sessionDoc = BSONDocument(copying: bson)
+        let sessionDoc = try BSONDocument(copying: bson)
         // key that libmongoc uses to store the client session id in options documents
         doc["sessionId"] = sessionDoc["sessionId"]
     }

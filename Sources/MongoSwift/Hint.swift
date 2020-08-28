@@ -1,4 +1,5 @@
 import Foundation
+import SwiftBSON
 
 /// An index to "hint" or force MongoDB to use when performing a query.
 public enum IndexHint: Codable {

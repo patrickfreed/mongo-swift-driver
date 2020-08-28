@@ -1,4 +1,5 @@
 import CLibMongoC
+import SwiftBSON
 
 /// Options to use when dropping an index from a `MongoCollection`.
 public struct DropIndexOptions: Encodable {

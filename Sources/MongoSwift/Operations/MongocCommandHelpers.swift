@@ -1,4 +1,5 @@
 import CLibMongoC
+import SwiftBSON
 
 /// Executes the provided closure using a stack-allocated, uninitialized, mutable bson_t. The bson_t is only valid for
 /// the body of the closure and must be copied if you wish to use it later on. The closure *must* initialize the
@@ -29,7 +30,7 @@ internal func runMongocCommandWithReply(
 ) throws -> BSONDocument {
     try withStackAllocatedMutableBSONPointer { replyPtr in
         try _runMongocCommand(command: command, options: options, replyPtr: replyPtr, body: body)
-        return BSONDocument(copying: replyPtr)
+        return try BSONDocument(copying: replyPtr)
     }
 }
 
@@ -52,7 +53,7 @@ private func _runMongocCommand(
         try withOptionalBSONPointer(to: options) { optsPtr in
             let success = body(cmdPtr, optsPtr, replyPtr, &error)
             guard success else {
-                throw extractMongoError(error: error, reply: BSONDocument(copying: replyPtr))
+                throw extractMongoError(error: error, reply: try BSONDocument(copying: replyPtr))
             }
         }
     }

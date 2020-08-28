@@ -1,6 +1,7 @@
 @testable import MongoSwift
 import Nimble
 import TestsCommon
+import SwiftBSON
 
 /// Indicates that a type has a read concern property, as well as a way to get a read concern from an instance of the
 /// corresponding mongoc type.

@@ -1,5 +1,6 @@
 import CLibMongoC
 import NIO
+import SwiftBSON
 
 /// Options to use when dropping a collection.
 public struct DropCollectionOptions: Codable {

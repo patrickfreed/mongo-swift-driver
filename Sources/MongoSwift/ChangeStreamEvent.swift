@@ -1,3 +1,5 @@
+import SwiftBSON
+
 /// An `UpdateDescription` containing fields that will be present in the change stream document for
 /// operations of type `update`.
 public struct UpdateDescription: Codable {

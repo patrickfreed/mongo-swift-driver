@@ -2,6 +2,7 @@ import Foundation
 @testable import MongoSwift
 import NIO
 import XCTest
+import SwiftBSON
 
 extension MongoSwiftTestCase {
     /// Gets the path of the directory containing spec files, depending on whether

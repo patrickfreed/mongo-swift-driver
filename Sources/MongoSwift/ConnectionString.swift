@@ -1,4 +1,5 @@
 import CLibMongoC
+import SwiftBSON
 
 /// Class representing a connection string for connecting to MongoDB.
 internal class ConnectionString {
@@ -484,9 +485,9 @@ internal class ConnectionString {
             /// This copy should not be returned directly as its only guaranteed valid for as long as the
             /// `mongoc_uri_t`, as `props` was statically initialized from data stored in the URI and may contain
             /// pointers that will be invalidated once the URI is.
-            let copy = BSONDocument(copying: propsPtr)
+            let copy = try? BSONDocument(copying: propsPtr)
 
-            return copy.mapValues { value in
+            return copy?.mapValues { value in
                 // mongoc returns boolean options e.g. CANONICALIZE_HOSTNAME as strings, but they are boolean values.
                 switch value {
                 case "true":
@@ -523,7 +524,9 @@ internal class ConnectionString {
         guard let optsDoc = mongoc_uri_get_options(self._uri) else {
             return nil
         }
-        var copy = BSONDocument(copying: optsDoc)
+        guard var copy = try? BSONDocument(copying: optsDoc) else {
+            return nil
+        }
 
         if let authSource = self.authSource {
             copy.authsource = .string(authSource)
@@ -573,7 +576,7 @@ internal class ConnectionString {
         guard let compressors = mongoc_uri_get_compressors(self._uri) else {
             return nil
         }
-        return BSONDocument(copying: compressors).keys
+        return try? BSONDocument(copying: compressors).keys
     }
 
     internal var replicaSet: String? {

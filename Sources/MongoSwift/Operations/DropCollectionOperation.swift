@@ -1,4 +1,5 @@
 import CLibMongoC
+import SwiftBSON
 
 /// An operation corresponding to a "drop" command on a collection.
 internal struct DropCollectionOperation<T: Codable>: Operation {

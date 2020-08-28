@@ -1,4 +1,5 @@
 import CLibMongoC
+import SwiftBSON
 
 /// Options to use when running a command against a `MongoDatabase`.
 public struct RunCommandOptions: Encodable {

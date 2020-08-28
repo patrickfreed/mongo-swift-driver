@@ -1,4 +1,5 @@
 import CLibMongoC
+import SwiftBSON
 
 /// A struct modeling the information returned from the `listDatabases` command about a single database.
 public struct DatabaseSpecification: Codable {
@@ -79,7 +80,7 @@ internal struct ListDatabasesOperation: Operation {
             }
         }
 
-        guard let databases = reply["databases"]?.arrayValue?.toArrayOf(BSONDocument.self) else {
+        guard let databases = reply["databases"]?.arrayValue?.compactMap({ $0.documentValue }) else {
             throw MongoError.InternalError(message: "Invalid server response: \(reply)")
         }
 

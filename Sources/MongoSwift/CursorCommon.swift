@@ -2,6 +2,7 @@ import CLibMongoC
 import Foundation
 import NIO
 import NIOConcurrencyHelpers
+import SwiftBSON
 
 /// A protocol describing the common public API between cursor-like objects in the driver.
 internal protocol CursorProtocol {
@@ -162,9 +163,13 @@ internal class Cursor<CursorKind: MongocCursorWrapper> {
         // If a reply is present, it implies the error occurred on the server. This *should* always be a commandError,
         // but we will still parse the mongoc error to cover all cases.
         if let docPtr = replyPtr.pointee {
-            // we have to copy because libmongoc owns the pointer.
-            let reply = BSONDocument(copying: docPtr)
-            return extractMongoError(error: error, reply: reply)
+            do {
+                // we have to copy because libmongoc owns the pointer.
+                let reply = try BSONDocument(copying: docPtr)
+                return extractMongoError(error: error, reply: reply)
+            } catch {
+                return error
+            }
         }
 
         // Otherwise, the only feasible error is that the user tried to advance a dead cursor,
@@ -210,7 +215,7 @@ internal class Cursor<CursorKind: MongocCursorWrapper> {
         }
 
         // We have to copy because libmongoc owns the pointer.
-        return BSONDocument(copying: pointee)
+        return try BSONDocument(copying: pointee)
     }
 
     /// Close this cursor

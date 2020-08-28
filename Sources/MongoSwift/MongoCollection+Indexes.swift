@@ -1,5 +1,6 @@
 import CLibMongoC
 import NIO
+import SwiftBSON
 
 /// A struct representing an index on a `MongoCollection`.
 public struct IndexModel: Codable {
@@ -17,7 +18,8 @@ public struct IndexModel: Codable {
 
     /// Gets the default name for this index.
     internal var defaultName: String {
-        self.keys.map { k, v in "\(k)_\(v.bsonValue)" }.joined(separator: "_")
+        // TODO: SWIFT-936: investigate
+        self.keys.map { k, v in "\(k)_\(v)" }.joined(separator: "_")
     }
 
     // Encode own data as well as nested options data

@@ -1,4 +1,5 @@
 import CLibMongoC
+import SwiftBSON
 
 /// The entity on which to start a change stream.
 internal enum ChangeStreamTarget<CollectionType: Codable> {

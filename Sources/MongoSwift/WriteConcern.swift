@@ -1,5 +1,6 @@
 import CLibMongoC
 import Foundation
+import SwiftBSON
 
 /// A class to represent a MongoDB write concern.
 public struct WriteConcern: Codable {

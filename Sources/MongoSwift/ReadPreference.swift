@@ -1,4 +1,5 @@
 import CLibMongoC
+import SwiftBSON
 
 /// Represents a MongoDB read preference, indicating which member(s) of a replica set read operations should be
 /// directed to.
@@ -215,7 +216,9 @@ public struct ReadPreference: Equatable {
             fatalError("Failed to retrieve read preference tags")
         }
         // we have to copy because libmongoc owns the pointer.
-        let wrappedTags = BSONDocument(copying: tagsPointer)
+        guard let wrappedTags = try? BSONDocument(copying: tagsPointer) else {
+            fatalError("malformed tags document in read preference initialization")
+        }
         if !wrappedTags.isEmpty {
             // swiftlint:disable:next force_unwrapping
             self.tagSets = wrappedTags.values.map { $0.documentValue! } // libmongoc will always return array of docs

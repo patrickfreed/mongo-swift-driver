@@ -1,5 +1,6 @@
 import CLibMongoC
 import Foundation
+import SwiftBSON
 
 /// The possible types of `MongoCursor` or `MongoCursor` an operation can return.
 public enum MongoCursorType {

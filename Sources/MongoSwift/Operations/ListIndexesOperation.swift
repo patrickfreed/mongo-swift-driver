@@ -1,4 +1,5 @@
 import CLibMongoC
+import SwiftBSON
 
 /// Internal intermediate result of a ListIndexes command.
 internal enum ListIndexesResults {

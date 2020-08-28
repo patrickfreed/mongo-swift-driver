@@ -1,4 +1,5 @@
 import CLibMongoC
+import SwiftBSON
 
 /// Options to use when executing a `countDocuments` command on a `MongoCollection`.
 public struct CountDocumentsOptions: Codable {
@@ -79,7 +80,7 @@ internal struct CountDocumentsOperation<T: Codable>: Operation {
                                 &error
                             )
                             guard count != -1 else {
-                                throw extractMongoError(error: error, reply: BSONDocument(copying: replyPtr))
+                                throw extractMongoError(error: error, reply: try BSONDocument(copying: replyPtr))
                             }
                             return Int(count)
                         }
