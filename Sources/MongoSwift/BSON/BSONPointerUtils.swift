@@ -34,4 +34,56 @@ extension SwiftBSON.BSONDocument {
             throw MongoError.InternalError(message: "failed initializing BSONDocument from bson_t: \(error)")
         }
     }
+
+    /// If the document already has an _id, returns it as-is. Otherwise, returns a new document
+    /// containing all the keys from this document, with an _id prepended.
+    internal func withID() throws -> SwiftBSON.BSONDocument {
+        if self.hasKey("_id") {
+            return self
+        }
+
+        var idDoc: SwiftBSON.BSONDocument = ["_id": .objectID()]
+        for (k, v) in self {
+            idDoc[k] = v
+        }
+        return self
+    }
+
+    /**
+     * Initializes a `BSONDocument` using an array where the values are optional
+     * `BSON`s. Values are stored under a string of their index in the
+     * array.
+     *
+     * - Parameters:
+     *   - elements: a `[BSON]`
+     *
+     * - Returns: a new `BSONDocument`
+     */
+    internal init(_ elements: [SwiftBSON.BSON]) {
+        // self._storage = Storage()
+        // for (i, elt) in elements.enumerated() {
+        //     do {
+        //         try self.setValue(for: String(i), to: elt, checkForKey: false)
+        //     } catch {
+        //         fatalError("Failed to set the value for index \(i) to \(String(describing: elt)): \(error)")
+        //     }
+        // }
+        fatalError("")
+    }
+}
+
+/**
+ * Executes the given closure with a read-only `BSONPointer` to the provided `BSONDocument` if non-nil.
+ * The pointer will only be valid within the body of the closure, and it MUST NOT be persisted outside of it.
+ *
+ * Use this function rather than optional chaining on `BSONDocument` to guarantee the provided closure is executed.
+ */
+internal func withOptionalBSONPointer<T>(
+    to document: BSONDocument?,
+    body: (BSONPointer?) throws -> T
+) rethrows -> T {
+    guard let doc = document else {
+        return try body(nil)
+    }
+    return try doc.withBSONPointer(body: body)
 }
