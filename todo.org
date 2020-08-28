@@ -1,0 +1,4 @@
+* TODO fill in fatalError things
+* TODO fill in default index name
+* TODO consolidate BSON util files + tests
+* TODO run tests
