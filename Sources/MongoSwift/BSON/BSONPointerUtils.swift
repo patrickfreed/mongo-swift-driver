@@ -61,16 +61,12 @@ extension SwiftBSON.BSONDocument {
      *
      * - Returns: a new `BSONDocument`
      */
-    internal init(_: [SwiftBSON.BSON]) {
-        // self._storage = Storage()
-        // for (i, elt) in elements.enumerated() {
-        //     do {
-        //         try self.setValue(for: String(i), to: elt, checkForKey: false)
-        //     } catch {
-        //         fatalError("Failed to set the value for index \(i) to \(String(describing: elt)): \(error)")
-        //     }
-        // }
-        fatalError("todo")
+    internal init(_ values: [SwiftBSON.BSON]) {
+        var doc = BSONDocument()
+        for (i, value) in values.enumerated() {
+            doc["\(i)"] = value
+        }
+        self = doc
     }
 }
 
