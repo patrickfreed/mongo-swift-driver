@@ -17,3 +17,5 @@ import SwiftBSON
 @_exported import struct SwiftBSON.BSONSymbol
 @_exported import struct SwiftBSON.BSONTimestamp
 @_exported import enum SwiftBSON.BSONType
+@_exported import class SwiftBSON.ExtendedJSONDecoder
+@_exported import class SwiftBSON.ExtendedJSONEncoder

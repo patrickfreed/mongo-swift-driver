@@ -70,6 +70,10 @@ extension Data {
             return try body(bytesPtr)
         }
     }
+
+    func hexEncodedString() -> String {
+        return map { String(format: "%02hhx", $0) }.joined()
+    }
 }
 
 extension bson_oid_t {

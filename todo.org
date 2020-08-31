@@ -1,4 +1,7 @@
-* TODO fill in fatalError things
-* TODO fill in default index name
-* TODO consolidate BSON util files + tests
+* DONE fill in fatalError things
+  CLOSED: [2020-08-31 Mon 15:59]
+* DONE fill in default index name
+  CLOSED: [2020-08-31 Mon 16:00]
+* DONE consolidate BSON util files + tests
+  CLOSED: [2020-08-31 Mon 16:02]
 * TODO run tests

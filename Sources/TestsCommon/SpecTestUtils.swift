@@ -20,13 +20,6 @@ extension MongoSwiftTestCase {
     }
 }
 
-extension BSONDocument {
-    public init(fromJSONFile file: URL) throws {
-        let jsonString = try String(contentsOf: file, encoding: .utf8)
-        try self.init(fromJSON: jsonString)
-    }
-}
-
 extension MongoDatabase {
     @discardableResult
     public func runCommand(
@@ -60,9 +53,8 @@ public func retrieveSpecTestFiles<T: Decodable>(
                 return nil
             }
             let url = URL(fileURLWithPath: "\(path)/\(filename)")
-            var doc = try BSONDocument(fromJSONFile: url)
-            doc["name"] = .string(filename)
-            return try (filename, BSONDecoder().decode(T.self, from: doc))
+            let jsonString = try String(contentsOf: url, encoding: .utf8)
+            return try (filename, ExtendedJSONDecoder().decode(T.self, from: jsonString.data(using: .utf8)!))
         }
 }
 

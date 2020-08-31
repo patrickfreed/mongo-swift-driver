@@ -102,7 +102,7 @@ extension BSONDocument {
         for (k, v) in self {
             idDoc[k] = v
         }
-        return self
+        return idDoc
     }
 
     /**

@@ -45,12 +45,12 @@ final class CrudTests: MongoSwiftTestCase {
                 // 4) verify that expected data is present
                 // 5) drop the collection to clean up
                 let collection = db.collection(self.getCollectionName(suffix: "\(filename)_\(i)"))
+                defer { try? collection.drop() }
                 if !file.data.isEmpty {
                     try collection.insertMany(file.data)
                 }
                 try test.execute(usingCollection: collection)
                 try test.verifyData(testCollection: collection, db: db)
-                try collection.drop()
             }
         }
         print() // for readability of results
@@ -168,7 +168,7 @@ private class CrudTest {
         if let name = collection["name"]?.stringValue {
             collToCheck = db.collection(name)
         }
-        expect(BSON.array(try collToCheck.find([:]).all().map { .document($0) })).to(equal(collection["data"]))
+        try self.verifyCursorContents(try collToCheck.find([:]), result: collection["data"])
     }
 
     // Given an `UpdateResult`, verify that it matches the expected results in this `CrudTest`.
@@ -196,7 +196,22 @@ private class CrudTest {
         if self.result == .null {
             expect(result).to(beNil())
         } else {
-            expect(result).to(equal(self.result?.documentValue))
+            expect(result).to(sortedEqual(self.result?.documentValue))
+        }
+    }
+
+    /// Given a cursor and a `BSON` containing an array of documents, verify that the cursors result
+    /// set is equivalent to the array of documents.
+    ///
+    /// This compares documents without considering key ordering.
+    func verifyCursorContents(_ cursor: MongoCursor<BSONDocument>, result: BSON?) throws {
+        guard let expectedResults = result?.arrayValue?.compactMap({ $0.documentValue }) else {
+            return
+        }
+        let results = try cursor.all()
+        expect(results.count).to(equal(expectedResults.count))
+        for (actual, expected) in zip(results, expectedResults) {
+            expect(actual).to(sortedEqual(expected), description: self.description)
         }
     }
 }
@@ -215,7 +230,7 @@ private class AggregateTest: CrudTest {
             expect(cursor.next()).to(beNil())
         } else {
             // if not $out, verify that the cursor contains the expected documents.
-            expect(BSON.array(try cursor.all().map { .document($0) })).to(equal(self.result))
+            try self.verifyCursorContents(cursor, result: self.result)
         }
     }
 }
@@ -349,8 +364,7 @@ private class FindTest: CrudTest {
             skip: self.skip,
             sort: self.sort
         )
-        let result = BSON.array(try coll.find(filter, options: options).all().map { .document($0) })
-        expect(result).to(equal(self.result))
+        try self.verifyCursorContents(try coll.find(filter, options: options), result: self.result) 
     }
 }
 
