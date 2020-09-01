@@ -81,9 +81,10 @@ internal enum TestData: Decodable {
     case single([BSONDocument])
 
     public init(from decoder: Decoder) throws {
-        if let array = try? [BSONDocument](from: decoder) {
+        let container = try decoder.singleValueContainer()
+        if let array = try? container.decode([BSONDocument].self) {
             self = .single(array)
-        } else if let document = try? BSONDocument(from: decoder) {
+        } else if let document = try? container.decode(BSONDocument.self) {
             var mapping: [String: [BSONDocument]] = [:]
             for (k, v) in document {
                 guard let documentArray = v.arrayValue?.compactMap({ $0.documentValue }) else {

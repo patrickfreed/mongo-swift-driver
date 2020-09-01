@@ -50,7 +50,8 @@ internal struct FailPoint: Decodable {
     }
 
     public init(from decoder: Decoder) throws {
-        self.failPoint = try BSONDocument(from: decoder)
+        let container = try decoder.singleValueContainer()
+        self.failPoint = try container.decode(BSONDocument.self)
     }
 
     internal func enable(using client: MongoClient, on serverAddress: ServerAddress? = nil) throws {
