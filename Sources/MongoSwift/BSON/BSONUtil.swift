@@ -81,13 +81,13 @@ internal func convertingBSONErrors<T>(_ body: () throws -> T) rethrows -> T {
 //     }
 // }
 
-extension BSONTimestamp {
-    /// Initializes a new  `BSONTimestamp` with the provided `timestamp` and `increment` values. Assumes
-    /// the values can successfully be converted to `UInt32`s without loss of precision.
-    internal init(timestamp: Int, inc: Int) {
-        self.init(timestamp: UInt32(timestamp), inc: UInt32(inc))
-    }
-}
+// extension BSONTimestamp {
+//     /// Initializes a new  `BSONTimestamp` with the provided `timestamp` and `increment` values. Assumes
+//     /// the values can successfully be converted to `UInt32`s without loss of precision.
+//     internal init(timestamp: Int, inc: Int) {
+//         self.init(timestamp: UInt32(timestamp), inc: UInt32(inc))
+//     }
+// }
 
 extension BSONDocument {
     /// If the document already has an _id, returns it as-is. Otherwise, returns a new document
