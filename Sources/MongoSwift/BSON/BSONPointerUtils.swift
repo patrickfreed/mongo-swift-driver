@@ -20,7 +20,7 @@ internal func withOptionalBSONPointer<T>(
     return try doc.withBSONPointer(body)
 }
 
-extension SwiftBSON.BSONDocument {
+extension BSONDocument {
     /// Executes the given closure with a read-only, stack-allocated pointer to a bson_t.
     /// The pointer is only valid within the body of the closure and MUST NOT be persisted outside of it.
     internal func withBSONPointer<T>(_ f: (BSONPointer) throws -> T) rethrows -> T {

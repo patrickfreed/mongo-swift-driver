@@ -7,7 +7,7 @@ import XCTest
 
 final class BSONPointerUtilsTests: MongoSwiftTestCase {
     func testWithBSONPointer() throws {
-        let doc: SwiftBSON.BSONDocument = ["x": 1]
+        let doc: BSONDocument = ["x": 1]
         doc.withBSONPointer { bsonPtr in
             guard let json = bson_as_relaxed_extended_json(bsonPtr, nil) else {
                 XCTFail("failed to get extjson")
@@ -33,7 +33,7 @@ final class BSONPointerUtilsTests: MongoSwiftTestCase {
             return
         }
 
-        let doc = try SwiftBSON.BSONDocument(copying: bson)
+        let doc = try BSONDocument(copying: bson)
         expect(doc).to(equal(["x": .int32(5), "y": .int32(5)]))
     }
 
