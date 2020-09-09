@@ -38,8 +38,6 @@ class ReadWriteConcernSpecTests: MongoSwiftTestCase {
             let tests: [BSONDocument] = asDocument["tests"]!.arrayValue!.compactMap { $0.documentValue }
             for test in tests {
                 let description: String = try test.get("description")
-                // skipping because C driver does not comply with these; see CDRIVER-2621
-                if description.lowercased().contains("wtimeoutms") { continue }
                 let uri: String = try test.get("uri")
                 let valid: Bool = try test.get("valid")
                 if valid {
