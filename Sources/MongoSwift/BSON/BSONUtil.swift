@@ -91,20 +91,6 @@ extension BSONTimestamp {
 }
 
 extension BSONDocument {
-    /// If the document already has an _id, returns it as-is. Otherwise, returns a new document
-    /// containing all the keys from this document, with an _id prepended.
-    internal func withID() throws -> BSONDocument {
-        if self.hasKey("_id") {
-            return self
-        }
-
-        var idDoc: BSONDocument = ["_id": .objectID()]
-        for (k, v) in self {
-            idDoc[k] = v
-        }
-        return idDoc
-    }
-
     /**
      * Initializes a `BSONDocument` using an array where the values are optional
      * `BSON`s. Values are stored under a string of their index in the

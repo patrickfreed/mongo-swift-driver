@@ -97,7 +97,7 @@ public enum WriteModel<CollectionType: Codable> {
             }
 
         case let .insertOne(value):
-            let document = try convertingBSONErrors { try encoder.encode(value).withID() }
+            let document: BSONDocument = try convertingBSONErrors { try encoder.encode(value).withID() }
             success = document.withBSONPointer { docPtr in
                 mongoc_bulk_operation_insert_with_opts(bulk, docPtr, nil, &error)
             }
