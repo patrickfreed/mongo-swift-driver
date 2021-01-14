@@ -12,11 +12,20 @@
       },
       {
         "package": "swift-bson",
-        "repositoryURL": "https://github.com/patrickfreed/swift-bson.git",
+        "repositoryURL": "https://github.com/patrickfreed/swift-bson",
         "state": {
-          "branch": "SWIFT-1026/json-to-bson-rebased",
-          "revision": "a90596deea73d34d25e066ff26cfb44ea4eff3ff",
+          "branch": "SWIFT-1044/bson-to-json",
+          "revision": "49397742421fcfe29938bb0fd1aea35fab654b14",
           "version": null
+        }
+      },
+      {
+        "package": "swift-extras-base64",
+        "repositoryURL": "https://github.com/swift-extras/swift-extras-base64",
+        "state": {
+          "branch": null,
+          "revision": "778e00dd7cc2b7970742f061cffc87dd570e6bfa",
+          "version": "0.5.0"
         }
       },
       {
