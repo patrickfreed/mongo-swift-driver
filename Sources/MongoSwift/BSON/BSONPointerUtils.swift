@@ -1,5 +1,6 @@
 import CLibMongoC
 import Foundation
+import NIO
 
 internal typealias BSONPointer = UnsafePointer<bson_t>
 internal typealias MutableBSONPointer = UnsafeMutablePointer<bson_t>
@@ -47,7 +48,8 @@ extension SwiftBSON.BSONDocument {
         }
         let bufferPtr = UnsafeBufferPointer(start: ptr, count: Int(bsonPtr.pointee.len))
         do {
-            try self.init(fromBSON: Data(bufferPtr))
+            let buf = ByteBufferAllocator().buffer(bytes: bufferPtr)
+            try self.init(fromUnsafeBSONBuffer: buf)
         } catch {
             throw MongoError.InternalError(message: "failed initializing BSONDocument from bson_t: \(error)")
         }
