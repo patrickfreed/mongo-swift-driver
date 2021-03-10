@@ -162,9 +162,8 @@ public enum TestTopologyConfiguration: String, Decodable {
             self = .single
         } else if isMasterReply["msg"] == "isdbgrid" {
             guard !shards.isEmpty else {
-                throw TestError(
-                    message: "isMasterReply \(isMasterReply) implies a sharded cluster, but config.shards is empty"
-                )
+                self = .shardedReplicaSet
+                return
             }
             for shard in shards {
                 guard let host = shard["host"]?.stringValue else {
@@ -351,6 +350,10 @@ public func sortedEqual<T: SortedEquatable>(_ expectedValue: T?) -> Predicate<T>
         let matches = expected.sortedEquals(actual)
         return PredicateResult(status: PredicateStatus(bool: matches), message: msg)
     }
+}
+
+public func failCountAssertion<T>(dataName: String, expectedCount: Int, actual: [T]) {
+    XCTFail("Expected \(dataName) to have count \(expectedCount), instead was \(actual.count): \(actual)")
 }
 
 public func printSkipMessage(testName: String, reason: String) {

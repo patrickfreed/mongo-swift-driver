@@ -38,7 +38,7 @@ struct UnifiedTestRunner {
             for address in MongoSwiftTestCase.getHosts() {
                 do {
                     _ = try self.internalClient.db("admin").runCommand(["killAllSessions": []], on: address)
-                } catch let commandError as MongoError.CommandError where commandError.code == 11601 {
+                } catch let commandError as MongoError.CommandError where [11601, 8000].contains(commandError.code) {
                     continue
                 }
             }

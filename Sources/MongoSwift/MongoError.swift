@@ -339,6 +339,12 @@ private func parseMongocError(_ error: bson_error_t, reply: BSONDocument?) -> Mo
 
 /// Internal function used to get an appropriate error from a libmongoc error and/or a server reply to a command.
 internal func extractMongoError(error bsonError: bson_error_t, reply: BSONDocument? = nil) -> MongoErrorProtocol {
+    if let s = reply {
+        print(s)
+    } else {
+        print("no reply: \(bsonError.code)")
+    }
+
     // if the reply is nil or writeErrors or writeConcernErrors aren't present, use the mongoc error to determine
     // what to throw.
     guard let serverReply: BSONDocument = reply,

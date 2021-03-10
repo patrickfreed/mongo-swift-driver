@@ -2,6 +2,7 @@ import Foundation
 import MongoSwiftSync
 import Nimble
 import TestsCommon
+import XCTest
 
 final class MongoDatabaseTests: MongoSwiftTestCase {
     override func setUp() {
@@ -107,7 +108,11 @@ final class MongoDatabaseTests: MongoSwiftTestCase {
 
         var collectionInfo = try Array(db.listCollections().all())
         collectionInfo.sort { $0.name < $1.name }
-        expect(collectionInfo).to(haveCount(3))
+        guard collectionInfo.count >= 2 else {
+            XCTFail("expected to have count >= 2, instead got count \(collectionInfo.count): " +
+                        "\(collectionInfo.map(\.name))")
+            return
+        }
 
         let fooInfo = CollectionSpecificationInfo.new(readOnly: false, uuid: UUID())
         let fooIndex = IndexModel(keys: ["_id": 1] as BSONDocument, options: IndexOptions(name: "_id_"))
@@ -129,8 +134,6 @@ final class MongoDatabaseTests: MongoSwiftTestCase {
             idIndex: nil
         )
         expect(collectionInfo[1]).to(equal(expectedView))
-
-        expect(collectionInfo[2].name).to(equal("system.views"))
     }
 
     func testListCollections() throws {

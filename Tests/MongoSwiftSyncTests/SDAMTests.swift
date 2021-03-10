@@ -46,7 +46,10 @@ final class SDAMTests: MongoSwiftTestCase {
             return
         }
 
-        expect(receivedEvents.count).to(equal(5))
+        guard receivedEvents.count == 5 else {
+            failCountAssertion(dataName: "received events", expectedCount: 5, actual: receivedEvents)
+            return
+        }
         expect(receivedEvents[0].topologyOpeningValue).toNot(beNil())
         expect(receivedEvents[1].topologyDescriptionChangedValue).toNot(beNil())
         expect(receivedEvents[2].serverOpeningValue).toNot(beNil())
@@ -87,7 +90,10 @@ final class SDAMTests: MongoSwiftTestCase {
         expect(newTopology.type).to(equal(.single))
 
         expect(prevTopology.servers).to(beEmpty())
-        expect(newTopology.servers).to(haveCount(1))
+        guard newTopology.servers.count == 1 else {
+            failCountAssertion(dataName: "newTopology.servers", expectedCount: 1, actual: newTopology.servers)
+            return
+        }
 
         expect(newTopology.servers[0].address).to(equal(hostAddress))
         expect(newTopology.servers[0].type).to(equal(.standalone))
