@@ -75,7 +75,7 @@ open class MongoSwiftTestCase: XCTestCase {
     }
 
     public static func getHosts() -> [ServerAddress] {
-        try! ConnectionString(self.uri).hosts!
+        try! ConnectionString(self.uri).hosts ?? []
     }
 
     // indicates whether we are running on a 32-bit platform

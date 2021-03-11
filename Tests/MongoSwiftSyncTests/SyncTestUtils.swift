@@ -111,8 +111,15 @@ extension MongoClient {
     ) throws -> MongoClient {
         var opts = options ?? MongoClientOptions()
         if MongoSwiftTestCase.ssl {
-            opts.tlsCAFile = URL(string: MongoSwiftTestCase.sslCAFilePath ?? "")
-            opts.tlsCertificateKeyFile = URL(string: MongoSwiftTestCase.sslPEMKeyFilePath ?? "")
+            opts.tls = true
+
+            if let ca = MongoSwiftTestCase.sslCAFilePath, opts.tlsCAFile == nil {
+                opts.tlsCAFile = URL(string: ca)
+            }
+
+            if let keyfile = MongoSwiftTestCase.sslPEMKeyFilePath, opts.tlsCertificateKeyFile == nil {
+                opts.tlsCertificateKeyFile = URL(string: keyfile)
+            }
         }
         return try MongoClient(uri, options: opts)
     }

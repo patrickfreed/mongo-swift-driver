@@ -58,9 +58,6 @@ final class RetryableReadsTests: MongoSwiftTestCase {
     func testRetryableReads() throws {
         let tests = try retrieveSpecTestFiles(specName: "retryable-reads", asType: RetryableReadsTestFile.self)
         for (_, testFile) in tests {
-            guard testFile.name == "aggregate-serverErrors.json" else {
-                continue
-            }
             try testFile.runTests()
         }
     }

@@ -11,13 +11,16 @@ extension MongoClient {
         options: MongoClientOptions? = nil
     ) throws -> MongoClient {
         var opts = options ?? MongoClientOptions()
-        // if SSL is on and custom TLS options were not provided, enable them
-        if MongoSwiftTestCase.ssl && opts.tlsCAFile == nil && opts.tlsCertificateKeyFile == nil {
-            if let caPath = MongoSwiftTestCase.sslCAFilePath {
-                opts.tlsCAFile = URL(string: caPath)
+        if MongoSwiftTestCase.ssl {
+            opts.tls = true
+
+            // if SSL is on and custom TLS options were not provided, enable them
+            if let ca = MongoSwiftTestCase.sslCAFilePath, opts.tlsCAFile == nil {
+                opts.tlsCAFile = URL(string: ca)
             }
-            if let keyPath = MongoSwiftTestCase.sslPEMKeyFilePath {
-                opts.tlsCertificateKeyFile = URL(string: keyPath)
+
+            if let keyfile = MongoSwiftTestCase.sslPEMKeyFilePath, opts.tlsCertificateKeyFile == nil {
+                opts.tlsCertificateKeyFile = URL(string: keyfile)
             }
         }
         return try MongoClient(uri, using: eventLoopGroup, options: opts)

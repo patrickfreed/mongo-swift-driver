@@ -103,7 +103,6 @@ final class MongoClientTests: MongoSwiftTestCase {
     func testResubmittingToThreadPool() throws {
         try self.withTestNamespace { _, _, coll in
             let docs: [BSONDocument] = (1...10).map { ["x": .int32($0)] }
-            print("inserting docs")
             _ = try coll.insertMany(docs).wait()
 
             print("creating cursors")
@@ -115,7 +114,7 @@ final class MongoClientTests: MongoSwiftTestCase {
             }
             for i in 1...100 {
                 do {
-                cursors.append(try coll.find().wait())
+                    cursors.append(try coll.find().wait())
                 } catch {
                     print("cursor \(i) failed: \(error)")
                 }

@@ -203,8 +203,7 @@ extension SpecTestFile {
                 do {
                     _ = try mongosClient.db("admin").runCommand(["killAllSessions": []])
                     break
-                } catch let commandError as MongoError.CommandError where commandError.code == 11601 {}
-                catch let commandError as MongoError.CommandError where commandError.code == 8000 {}
+                } catch let commandError as MongoError.CommandError where [11601, 8000].contains(commandError.code) {}
             }
         }
     }
@@ -244,10 +243,6 @@ extension SpecTestFile {
 
         fileLevelLog("Executing tests from file \(self.name)...")
         for var test in self.tests {
-            guard test.description == "Aggregate succeeds after InterruptedAtShutdown" else {
-                continue
-            }
-
             if let keyword = Self.TestType.skippedTestKeywords.first(where: { test.description.contains($0) }) {
                 print("Skipping test \(test.description) due to matched keyword \"\(keyword)\".")
                 continue

@@ -110,7 +110,7 @@ final class MongoDatabaseTests: MongoSwiftTestCase {
         collectionInfo.sort { $0.name < $1.name }
         guard collectionInfo.count >= 2 else {
             XCTFail("expected to have count >= 2, instead got count \(collectionInfo.count): " +
-                        "\(collectionInfo.map(\.name))")
+                "\(collectionInfo.map(\.name))")
             return
         }
 
