@@ -121,6 +121,12 @@ extension MongoClient {
                 opts.tlsCertificateKeyFile = URL(string: keyfile)
             }
         }
+
+        if MongoSwiftTestCase.serverless {
+            if opts.compressors == nil {
+                opts.compressors = [.zlib]
+            }
+        }
         return try MongoClient(uri, options: opts)
     }
 

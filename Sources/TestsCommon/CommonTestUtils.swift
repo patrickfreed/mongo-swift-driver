@@ -133,6 +133,10 @@ open class MongoSwiftTestCase: XCTestCase {
     public static var auth: Bool {
         ProcessInfo.processInfo.environment["AUTH"] == "auth"
     }
+
+    public static var serverless: Bool {
+        ProcessInfo.processInfo.environment["SERVERLESS_PROXY_TESTING"] == "true"
+    }
 }
 
 /// Enumerates the different topology configurations that are used throughout the tests

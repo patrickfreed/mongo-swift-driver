@@ -1,6 +1,6 @@
 #!/bin/bash
 
-swift test \
+SERVERLESS_PROXY_TESTING="true" swift test \
       --skip ChangeStream \
       --skip Resubmit \
       --skip NonTailableCursor \

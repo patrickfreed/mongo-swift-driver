@@ -119,7 +119,6 @@ final class MongoClientTests: MongoSwiftTestCase {
                     print("cursor \(i) failed: \(error)")
                 }
             }
-            print("cursors done")
 
             // queue up more operations
             let waitingOperations = (1...MongoClient.defaultThreadPoolSize).map { _ in coll.countDocuments() }
