@@ -176,6 +176,18 @@ functions:
           ATLAS_REPL_SRV='${ATLAS_REPL_SRV}' ATLAS_SHRD_SRV='${ATLAS_SHRD_SRV}' ATLAS_FREE_SRV='${ATLAS_FREE_SRV}' ATLAS_TLS11_SRV='${ATLAS_TLS11_SRV}' ATLAS_TLS12_SRV='${ATLAS_TLS12_SRV}' \
           sh ${PROJECT_DIRECTORY}/.evergreen/run-atlas-tests.sh
 
+  "run serverless proxy tests":
+    - command: shell.exec
+      type: test
+      params:
+        silent: true
+        working_dir: "src"
+        script: |
+          # DO NOT ECHO WITH XTRACE (which PREPARE_SHELL does)
+          SWIFT_VERSION=${SWIFT_VERSION} \
+          MONGODB_URI=${ATLAS_SERVERLESS_SRV} \
+            bash ${PROJECT_DIRECTORY}/.evergreen/run-serverless-proxy-tests.sh
+
   "run ocsp test":
     - command: shell.exec
       type: test
@@ -531,6 +543,13 @@ tasks:
       tags: ["atlas-connect"]
       commands:
         - func: "run atlas tests"
+
+    - name: "test-serverless-proxy"
+      tags: ["serverless-proxy"]
+      commands:
+        # - func: "acquire serverless instance lock"
+        - func: "run serverless proxy tests"
+        # - func: "release serverless instance lock"
 
     - name: test-ocsp-rsa-valid-cert-server-staples
       tags: ["ocsp", "ocsp-rsa", "ocsp-staple"]
@@ -1092,6 +1111,15 @@ buildvariants:
   display_name: "Atlas Connectivity ${swift-version} ${os-fully-featured}"
   tasks:
     - ".atlas-connect"
+
+- matrix_name: "serverless-proxy-5.3"
+  matrix_spec:
+    os-fully-featured:
+      - "ubuntu-18.04"
+    swift-version: "5.3"
+  display_name: "Atlas Serverless Proxy Tests ${swift-version} ${os-fully-featured}"
+  tasks:
+    - ".serverless-proxy"
 
 - matrix_name: "format-lint"
   display_name: "Format and Lint"
