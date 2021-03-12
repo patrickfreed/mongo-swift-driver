@@ -200,13 +200,21 @@ public enum UnmetRequirement {
     case minServerVersion(actual: ServerVersion, required: ServerVersion)
     case maxServerVersion(actual: ServerVersion, required: ServerVersion)
     case topology(actual: TestTopologyConfiguration, required: [TestTopologyConfiguration])
+    case serverless(required: TestRequirement.ServerlessMode)
 }
 
 /// Struct representing conditions that a deployment must meet in order for a test file to be run.
 public struct TestRequirement: Decodable {
+    public enum ServerlessMode: String, Decodable {
+        case requireServerless
+        case forbidServerless
+        case allowServerless
+    }
+
     private let minServerVersion: ServerVersion?
     private let maxServerVersion: ServerVersion?
     private let topologies: [TestTopologyConfiguration]?
+    private let serverlessMode: ServerlessMode?
 
     public static let failCommandSupport: [TestRequirement] = [
         TestRequirement(
@@ -222,11 +230,13 @@ public struct TestRequirement: Decodable {
     public init(
         minServerVersion: ServerVersion? = nil,
         maxServerVersion: ServerVersion? = nil,
-        acceptableTopologies: [TestTopologyConfiguration]? = nil
+        acceptableTopologies: [TestTopologyConfiguration]? = nil,
+        serverlessMode: ServerlessMode? = nil
     ) {
         self.minServerVersion = minServerVersion
         self.maxServerVersion = maxServerVersion
         self.topologies = acceptableTopologies
+        self.serverlessMode = serverlessMode
     }
 
     /// Determines if the given deployment meets this requirement.
@@ -247,19 +257,34 @@ public struct TestRequirement: Decodable {
         if let topologies = self.topologies {
             // When matching a "sharded" topology, test runners MUST accept any type of sharded cluster (i.e. "sharded"
             // implies "sharded-replicaset", but not vice versa).
-            if topology == .shardedReplicaSet && topologies.contains(.sharded) {
-                return nil
-            }
-
-            guard topologies.contains(topology) else {
+            guard topologies.contains(topology) ||
+                    (topology == .shardedReplicaSet && topologies.contains(.sharded))
+            else {
                 return .topology(actual: topology, required: topologies)
             }
+
+            if let serverlessMode = self.serverlessMode {
+                switch serverlessMode {
+                case .allowServerless:
+                    break
+                case .forbidServerless:
+                    guard !MongoSwiftTestCase.serverless else {
+                        return .serverless(required: serverlessMode)
+                    }
+                case .requireServerless:
+                    guard MongoSwiftTestCase.serverless else {
+                        return .serverless(required: serverlessMode)
+                    }
+                }
+            }
+
+            return nil
         }
         return nil
     }
 
     private enum CodingKeys: String, CodingKey {
-        case minServerVersion, maxServerVersion, topology, topologies
+        case minServerVersion, maxServerVersion, topology, topologies, serverlessMode
     }
 
     public init(from decoder: Decoder) throws {
@@ -274,6 +299,7 @@ public struct TestRequirement: Decodable {
         } else {
             self.topologies = nil
         }
+        self.serverlessMode = try container.decodeIfPresent(ServerlessMode.self, forKey: .serverlessMode)
     }
 }
 
@@ -377,6 +403,15 @@ public func printSkipMessage(
         reason = "maximum required server version \(required) not met by current server version \(actual)"
     case let .topology(actual, required):
         reason = "unsupported topology type \(actual), supported topologies are: \(required)"
+    case let .serverless(required):
+        switch required {
+        case .allowServerless:
+            fatalError("allowServerless should not cause a test to be skipped")
+        case .forbidServerless:
+            reason = "this test is not supported by Serverless"
+        case .requireServerless:
+            reason = "this test must be run against a Serverless instance"
+        }
     }
     printSkipMessage(testName: testName, reason: reason)
 }

@@ -346,10 +346,8 @@ final class SyncChangeStreamTests: MongoSwiftTestCase {
             switch unmetRequirement {
             case .minServerVersion, .maxServerVersion:
                 print("Skipping test; see SWIFT-722")
-            case .topology:
+            default:
                 printSkipMessage(testName: self.name, unmetRequirement: unmetRequirement!)
-            case .none:
-                break
             }
             return
         }
