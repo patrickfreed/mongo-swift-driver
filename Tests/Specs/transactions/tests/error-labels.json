@@ -10,7 +10,8 @@
       "minServerVersion": "4.1.8",
       "topology": [
         "sharded"
-      ]
+      ],
+        "serverlessMode": "forbidServerless"
     }
   ],
   "database_name": "transaction-tests",
