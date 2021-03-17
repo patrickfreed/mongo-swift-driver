@@ -72,7 +72,10 @@ extension BSONDocument: Matchable {
             // If the expected document has "key": null then the actual document must either have "key": null
             // or no reference to "key".
             guard let aV = self[eK] else {
-                return eV == .null
+                guard eV == .null else {
+                    return false
+                }
+                continue
             }
             guard aV.matches(expected: eV) else {
                 return false
