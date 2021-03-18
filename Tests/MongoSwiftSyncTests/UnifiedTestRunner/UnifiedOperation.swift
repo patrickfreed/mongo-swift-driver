@@ -192,6 +192,12 @@ struct UnifiedOperation: Decodable {
             self.operation = UnifiedStartTransaction()
         case "targetedFailPoint":
             self.operation = try container.decode(UnifiedTargetedFailPoint.self, forKey: .arguments)
+        case "estimatedDocumentCount":
+            guard let op = try container.decodeIfPresent(UnifiedEstimatedDocumentCount.self, forKey: .arguments) else {
+                self.operation = UnifiedEstimatedDocumentCount()
+                break
+            }
+            self.operation = op
         // GridFS ops
         case "delete", "download", "upload":
             self.operation = Placeholder()

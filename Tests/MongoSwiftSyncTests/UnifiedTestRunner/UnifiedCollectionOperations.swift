@@ -409,3 +409,28 @@ struct UnifiedReplaceOne: UnifiedOperationProtocol {
         return .bson(.document(encoded))
     }
 }
+
+struct UnifiedEstimatedDocumentCount: UnifiedOperationProtocol {
+    /// Options to use while executing the operation.
+    let options: EstimatedDocumentCountOptions?
+
+    private enum CodingKeys: CodingKey {}
+
+    static var knownArguments: Set<String> {
+        Set(EstimatedDocumentCountOptions().propertyNames)
+    }
+
+    init(from decoder: Decoder) throws {
+        self.options = try decoder.singleValueContainer().decode(EstimatedDocumentCountOptions.self)
+    }
+
+    init() {
+        self.options = nil
+    }
+
+    func execute(on object: UnifiedOperation.Object, context: Context) throws -> UnifiedOperationResult {
+        let collection = try context.entities.getEntity(from: object).asCollection()
+        let result = try collection.estimatedDocumentCount(options: options)
+        return .bson(.int64(Int64(result)))
+    }
+}

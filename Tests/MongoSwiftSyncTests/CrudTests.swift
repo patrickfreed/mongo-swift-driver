@@ -65,6 +65,21 @@ final class CrudTests: MongoSwiftTestCase {
     func testWrites() throws {
         try self.doTests(forSubdirectory: "write")
     }
+
+    func testUnifiedCrud() throws {
+        let files = try retrieveSpecTestFiles(
+            specName: "crud",
+            subdirectory: "unified",
+            asType: UnifiedTestFile.self
+        ).map { $0.1 }
+
+        let skips = [
+            // TODO: SWIFT-1099 unskip these tests
+            "estimatedDocumentCount": ["*"]
+        ]
+        let runner = try UnifiedTestRunner()
+        try runner.runFiles(files, skipTests: skips)
+    }
 }
 
 /// A container for the data from a single .json file.

@@ -191,9 +191,8 @@ extension SpecTestFile {
         switch try client.topologyType() {
         case .single:
             return
-        case _ where MongoSwiftTestCase.serverless:
-            fallthrough
-        case .replicaSet:
+        case .replicaSet,
+             _ where MongoSwiftTestCase.serverless:
             // The test runner MAY ignore any command failure with error Interrupted(11601) to work around
             // SERVER-38335.
             do {

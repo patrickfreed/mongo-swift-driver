@@ -83,6 +83,7 @@ extension CrudTests {
     static var allTests = [
         ("testReads", testReads),
         ("testWrites", testWrites),
+        ("testUnifiedCrud", testUnifiedCrud),
     ]
 }
 
