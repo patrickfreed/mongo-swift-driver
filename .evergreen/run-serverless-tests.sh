@@ -42,7 +42,7 @@ swift build
 # set +o errexit # even if tests fail we want to parse the results, so disable errexit
 # set -o pipefail # propagate error codes in the following pipes
 
-MONGODB_TOPOLOGY=${TOPOLOGY} MONGODB_URI=$MONGODB_URI SERVERLESS_PROXY_TESTING="true" \
+MONGODB_TOPOLOGY=${TOPOLOGY} MONGODB_URI=$MONGODB_URI SERVERLESS="serverless" \
   swift test \
     --skip ChangeStream \
     --skip Resubmit \

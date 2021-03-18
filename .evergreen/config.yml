@@ -176,17 +176,30 @@ functions:
           ATLAS_REPL_SRV='${ATLAS_REPL_SRV}' ATLAS_SHRD_SRV='${ATLAS_SHRD_SRV}' ATLAS_FREE_SRV='${ATLAS_FREE_SRV}' ATLAS_TLS11_SRV='${ATLAS_TLS11_SRV}' ATLAS_TLS12_SRV='${ATLAS_TLS12_SRV}' \
           sh ${PROJECT_DIRECTORY}/.evergreen/run-atlas-tests.sh
 
-  "run serverless proxy tests":
+  "run serverless":
+    - command: shell.exec
+      params:
+        script: |
+          ${PREPARE_SHELL}
+          MONGODB_VERSION=${VERSION} sh ${DRIVERS_TOOLS}/.evergreen/run-serverless.sh
+    # run-serverless generates expansion file with the MONGODB_URI for the cluster
+    - command: expansions.update
+      params:
+        file: serverless-expansion.yml
+
+  "run serverless tests":
     - command: shell.exec
       type: test
       params:
-        silent: true
         working_dir: "src"
         script: |
-          # DO NOT ECHO WITH XTRACE (which PREPARE_SHELL does)
+          ${PREPARE_SHELL}
+          AUTH=${AUTH} \
+          SSL=${SSL} \
+          MONGODB_URI="${MONGODB_URI}" \
+          MONGODB_VERSION=${MONGODB_VERSION} \
           SWIFT_VERSION=${SWIFT_VERSION} \
-          MONGODB_URI=${ATLAS_SERVERLESS_SRV} \
-            bash ${PROJECT_DIRECTORY}/.evergreen/run-serverless-proxy-tests.sh
+            ${PROJECT_DIRECTORY}/.evergreen/run-serverless-tests.sh
 
   "run ocsp test":
     - command: shell.exec
@@ -539,17 +552,18 @@ tasks:
             TOPOLOGY: "sharded_cluster"
         - func: "run tests"
 
+    - name: "test-latest-serverless"
+      tags: ["latest", "serverless"]
+      commands:
+        - func: "run serverless"
+          vars:
+            MONGODB_VERSION: "latest"
+        - func: "run serverless tests"
+
     - name: "test-atlas-connectivity"
       tags: ["atlas-connect"]
       commands:
         - func: "run atlas tests"
-
-    - name: "test-serverless-proxy"
-      tags: ["serverless-proxy"]
-      commands:
-        # - func: "acquire serverless instance lock"
-        - func: "run serverless proxy tests"
-        # - func: "release serverless instance lock"
 
     - name: test-ocsp-rsa-valid-cert-server-staples
       tags: ["ocsp", "ocsp-rsa", "ocsp-staple"]
@@ -1112,14 +1126,14 @@ buildvariants:
   tasks:
     - ".atlas-connect"
 
-- matrix_name: "serverless-proxy-5.3"
+- matrix_name: "serverless-5.3"
   matrix_spec:
     os-fully-featured:
       - "ubuntu-18.04"
     swift-version: "5.3"
-  display_name: "Atlas Serverless Proxy Tests ${swift-version} ${os-fully-featured}"
+  display_name: "Serverless ${swift-version} ${os-fully-featured}"
   tasks:
-    - ".serverless-proxy"
+    - ".serverless"
 
 - matrix_name: "format-lint"
   display_name: "Format and Lint"

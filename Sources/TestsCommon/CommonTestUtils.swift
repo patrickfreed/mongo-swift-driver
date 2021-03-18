@@ -135,7 +135,7 @@ open class MongoSwiftTestCase: XCTestCase {
     }
 
     public static var serverless: Bool {
-        ProcessInfo.processInfo.environment["SERVERLESS_PROXY_TESTING"] == "true"
+        ProcessInfo.processInfo.environment["SERVERLESS"] == "serverless"
     }
 }
 
