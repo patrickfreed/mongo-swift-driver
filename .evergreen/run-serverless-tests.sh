@@ -41,42 +41,16 @@ swift build
 # test the driver
 # set +o errexit # even if tests fail we want to parse the results, so disable errexit
 # set -o pipefail # propagate error codes in the following pipes
+FILTER_REGEX='('
+FILTER_REGEX+='Crud|ClientSession|ConnectionString|ConnectionPool|MongoCollectionTests|'
+FILTER_REGEX+='MongoCollection_Bulk|MongoCollection_Index|AsyncNext|CursorToArray|testForEach|'
+FILTER_REGEX+='CursorId|MongoDatabaseTests.test[^A]|ReadConcernTests|ReadPreference|'
+FILTER_REGEX+='ReadWriteConcern|WriteConcern|SDAM'
+# FILTER_REGEX+='|Transactions|Retryable'
+FILTER_REGEX+=')'
 
 MONGODB_TOPOLOGY=${TOPOLOGY} MONGODB_URI=$MONGODB_URI SERVERLESS="serverless" \
-   swift test \
-     --filter Crud \
-     --filter ClientSession \
-     --filter ConnectionString \
-     --filter ConnectionPool \
-     --filter MongoCollectionTests \
-     --filter MongoCollection_Bulk \
-     --filter MongoCollection_Index \
-     --filter AsyncNext \
-     --filter CursorToArray \
-     --filter testForEach \
-     --filter CursorId \
-     --filter "MongoDatabaseTests.test[^A]" \
-     --filter ReadConcernTests \
-     --filter ReadPreference \
-     --filter ReadWriteConcern \
-     --filter WriteConcern \
-     --filter SDAM
-#  --filter Transactions
-#  --filter Retryable
-
-
-  # swift test \
-  #   --filter ChangeStream \
-  #   --skip Resubmit \
-  #   --skip NonTailableCursor \
-  #   --skip TailableAwait \
-  #   --skip EventLoopBoundDb \
-  #   --skip MongoDatabaseTests.testAggregate \
-  #   --skip AuthProseTests \
-  #   --skip TransactionsTests \
-  #   --skip Retryable \
-  #   --skip ListDatabases \
-  #   --skip SampleUnified # 2>&1 | tee ${RAW_TEST_RESULTS}
+    swift test --filter="$FILTER_REGEX"
 
 # save tests exit code
 EXIT_CODE=$?
