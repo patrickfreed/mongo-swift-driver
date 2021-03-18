@@ -44,12 +44,23 @@ final class MongoCursorTests: MongoSwiftTestCase {
 
             // run killCursors so next iteration fails on the server
             try db.runCommand(["killCursors": .string(coll.name), "cursors": [.int64(cursor.id!)]])
-            let expectedError2 = MongoError.CommandError.new(
-                code: 43,
-                codeName: "CursorNotFound",
-                message: "",
-                errorLabels: nil
-            )
+
+            let expectedError2: Error
+            if MongoSwiftTestCase.serverless {
+                expectedError2 = MongoError.CommandError.new(
+                    code: 8000,
+                    codeName: "AtlasError",
+                    message: "",
+                    errorLabels: nil
+                )
+            } else {
+                expectedError2 = MongoError.CommandError.new(
+                    code: 43,
+                    codeName: "CursorNotFound",
+                    message: "",
+                    errorLabels: nil
+                )
+            }
             expect(try cursor.next()?.get()).to(throwError(expectedError2))
             // cursor should be closed now that it errored
             expect(cursor.isAlive()).to(beFalse())

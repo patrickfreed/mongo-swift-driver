@@ -43,18 +43,40 @@ swift build
 # set -o pipefail # propagate error codes in the following pipes
 
 MONGODB_TOPOLOGY=${TOPOLOGY} MONGODB_URI=$MONGODB_URI SERVERLESS="serverless" \
-  swift test \
-    --skip ChangeStream \
-    --skip Resubmit \
-    --skip NonTailableCursor \
-    --skip TailableAwait \
-    --skip EventLoopBoundDb \
-    --skip MongoDatabaseTests.testAggregate \
-    --skip AuthProseTests \
-    --skip TransactionsTests \
-    --skip Retryable \
-    --skip ListDatabases \
-    --skip SampleUnified # 2>&1 | tee ${RAW_TEST_RESULTS}
+   swift test \
+     --filter Crud \
+     --filter ClientSession \
+     --filter ConnectionString \
+     --filter ConnectionPool \
+     --filter MongoCollectionTests \
+     --filter MongoCollection_Bulk \
+     --filter MongoCollection_Index \
+     --filter AsyncNext \
+     --filter CursorToArray \
+     --filter testForEach \
+     --filter CursorId \
+     --filter "MongoDatabaseTests.test[^A]" \
+     --filter ReadConcernTests \
+     --filter ReadPreference \
+     --filter ReadWriteConcern \
+     --filter WriteConcern \
+     --filter SDAM
+#  --filter Transactions
+#  --filter Retryable
+
+
+  # swift test \
+  #   --filter ChangeStream \
+  #   --skip Resubmit \
+  #   --skip NonTailableCursor \
+  #   --skip TailableAwait \
+  #   --skip EventLoopBoundDb \
+  #   --skip MongoDatabaseTests.testAggregate \
+  #   --skip AuthProseTests \
+  #   --skip TransactionsTests \
+  #   --skip Retryable \
+  #   --skip ListDatabases \
+  #   --skip SampleUnified # 2>&1 | tee ${RAW_TEST_RESULTS}
 
 # save tests exit code
 EXIT_CODE=$?
