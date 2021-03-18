@@ -287,7 +287,7 @@ public struct TestRequirement: Decodable {
             // When matching a "sharded" topology, test runners MUST accept any type of sharded cluster (i.e. "sharded"
             // implies "sharded-replicaset", but not vice versa).
             guard topologies.contains(topology) ||
-                    (topology == .shardedReplicaSet && topologies.contains(.sharded))
+                (topology == .shardedReplicaSet && topologies.contains(.sharded))
             else {
                 return .topology(actual: topology, required: topologies)
             }
