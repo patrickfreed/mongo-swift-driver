@@ -555,6 +555,7 @@ tasks:
     - name: "test-latest-serverless"
       tags: ["latest", "serverless"]
       commands:
+        - func: "prepare resources"
         - func: "run serverless"
           vars:
             MONGODB_VERSION: "latest"
