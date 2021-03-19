@@ -4,6 +4,7 @@ import Nimble
 import NIO
 import NIOConcurrencyHelpers
 import TestsCommon
+import XCTest
 
 private let doc1: BSONDocument = ["_id": 1, "x": 1]
 private let doc2: BSONDocument = ["_id": 2, "x": 2]
@@ -263,18 +264,91 @@ final class AsyncMongoCursorTests: MongoSwiftTestCase {
         }
     }
 
+    /// Required prose tests for Serverless testing.
     func testCursorId() throws {
-        try self.withTestNamespace { _, _, coll in
-            _ = try coll.insertMany([["x": 1], ["x": 2]]).wait()
-            // use batchSize of 1 so the cursor has to use multiple batches and will have an id
-            let options = FindOptions(batchSize: 1)
-            let cursorWithId = try coll.find(options: options).wait()
-            defer { try? cursorWithId.kill().wait() }
-            expect(cursorWithId.id).toNot(beNil())
+        func cursorIdTest(monitor: TestCommandMonitor, observedId: Int64, ns: MongoNamespace) throws {
+            let events = monitor.events(withNames: ["find", "killCursors"])
+            guard events.count == 4 else {
+                XCTFail("expected 4 events, got \(events.count) instead: \(events)")
+                return
+            }
+
+            expect(events[0].commandName).to(equal("find"))
+            expect(events[1].commandName).to(equal("find"))
+            guard case let .succeeded(findSucceeded) = events[1] else {
+                XCTFail("find succeeded not observed: \(events[1])")
+                return
+            }
+            guard
+                let cursorDoc = findSucceeded.reply["cursor"]?.documentValue,
+                let findId = cursorDoc["id"]?.toInt64(),
+                let namespace = cursorDoc["ns"]?.stringValue
+            else {
+                XCTFail("find reply missing cursor id or ns: \(findSucceeded.reply)")
+                return
+            }
+            expect(findId).to(equal(observedId))
+            expect(namespace).to(equal(ns.description))
+
+            expect(events[2].commandName).to(equal("killCursors"))
+            guard case let .started(killCursorsStarted) = events[2] else {
+                XCTFail("killCursors started event not observed: \(events[2])")
+                return
+            }
+            expect(killCursorsStarted.databaseName).to(equal(ns.db))
+            expect(killCursorsStarted.command["$db"]?.stringValue).to(equal(ns.db))
+            expect(killCursorsStarted.command["killCursors"]?.stringValue).to(equal(ns.collection))
+            expect(killCursorsStarted.command["cursors"]?.arrayValue).to(equal([.int64(findId)]))
+
+            expect(events[3].commandName).to(equal("killCursors"))
+            guard case let .succeeded(killCursorsSucceeded) = events[3] else {
+                XCTFail("killCursors succeeded event not observed: \(events[3])")
+                return
+            }
+            expect(killCursorsSucceeded.reply["cursorsKilled"]).to(equal([.int64(findId)]))
+        }
+
+        // test after just initial find
+        try self.withTestNamespace { client, _, coll in
+            _ = try coll.insertMany([["x": 1], ["x": 2], ["x": 3]]).wait()
+
+            let monitor = client.addCommandMonitor()
+            var observedId: Int64 = 0
+
+            try monitor.captureEvents {
+                // use batchSize of 1 so the cursor has to use multiple batches and will have an id
+                let options = FindOptions(batchSize: 1)
+                let cursorWithId = try coll.find(options: options).wait()
+                defer { try? cursorWithId.kill().wait() }
+                expect(cursorWithId.id).toNot(beNil())
+                observedId = cursorWithId.id!
+            }
 
             let cursorNoId = try coll.find().wait()
             defer { try? cursorNoId.kill().wait() }
             expect(cursorNoId.id).to(beNil())
+
+            try cursorIdTest(monitor: monitor, observedId: observedId, ns: coll.namespace)
+        }
+
+        // test after one getMore
+        try self.withTestNamespace { client, _, coll in
+            _ = try coll.insertMany([["x": 1], ["x": 2], ["x": 3]]).wait()
+
+            let monitor = client.addCommandMonitor()
+            var observedId: Int64 = 0
+
+            try monitor.captureEvents {
+                // use batchSize of 1 so the cursor has to use multiple batches and will have an id
+                let options = FindOptions(batchSize: 1)
+                let cursorWithId = try coll.find(options: options).wait()
+                defer { try? cursorWithId.kill().wait() }
+                expect(cursorWithId.id).toNot(beNil())
+                observedId = cursorWithId.id!
+                expect(try cursorWithId.next().wait()).toNot(beNil())
+            }
+
+            try cursorIdTest(monitor: monitor, observedId: observedId, ns: coll.namespace)
         }
     }
 }

@@ -101,3 +101,12 @@ extension CommandEvent {
         return event
     }
 }
+
+extension MongoClient {
+    /// Attaches a `TestCommandMonitor` to the client and returns it.
+    public func addCommandMonitor() -> TestCommandMonitor {
+        let monitor = TestCommandMonitor()
+        self.addCommandEventHandler(monitor)
+        return monitor
+    }
+}
