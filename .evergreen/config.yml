@@ -194,8 +194,10 @@ functions:
         working_dir: "src"
         script: |
           ${PREPARE_SHELL}
+
           AUTH=${AUTH} \
           SSL=${SSL} \
+          SSL_CA_FILE=${SSL_CA_FILE} \
           MONGODB_URI="${MONGODB_URI}" \
           MONGODB_VERSION=${MONGODB_VERSION} \
           SWIFT_VERSION=${SWIFT_VERSION} \
