@@ -134,6 +134,14 @@ open class MongoSwiftTestCase: XCTestCase {
         ProcessInfo.processInfo.environment["AUTH"] == "auth"
     }
 
+    public static var scramUser: String? {
+        ProcessInfo.processInfo.environment["MONGODB_SCRAM_USER"]
+    }
+
+    public static var scramPassword: String? {
+        ProcessInfo.processInfo.environment["MONGODB_SCRAM_PASSWORD"]
+    }
+
     /// Returns the API version specified by the environment variable $MONGODB_API_VERSION, if any.
     public static var apiVersion: MongoServerAPI.Version? {
         guard let versionString = ProcessInfo.processInfo.environment["MONGODB_API_VERSION"] else {
