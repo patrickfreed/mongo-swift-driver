@@ -32,8 +32,8 @@ final class CrudTests: MongoSwiftTestCase {
 
             // For each file, execute the test cases contained in it
             for (i, test) in try file.makeTests().enumerated() {
-                if type(of: test) == CountTest.self {
-                    print("Skipping test for old count API, no longer supported by the driver")
+                if type(of: test) == EstimatedDocumentCountTest.self {
+                    continue
                 }
 
                 print("Executing test: \(test.description)")

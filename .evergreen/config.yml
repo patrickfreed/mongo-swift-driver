@@ -95,8 +95,10 @@ functions:
             # If this was a patch build, doing a fresh clone would not actually test the patch
             cp -R ${PROJECT_DIRECTORY}/ $DRIVERS_TOOLS
           else
-            git clone git://github.com/mongodb-labs/drivers-evergreen-tools.git $DRIVERS_TOOLS
+            git clone git://github.com/patrickfreed/drivers-evergreen-tools.git --branch "DRIVERS-1603/serverless-live-testing" $DRIVERS_TOOLS
           fi
+          echo "DRIVERS TOOLS: ${DRIVERS_TOOLS}"
+          echo "MONGO ORCHESTRATION HOME: ${MONGO_ORCHESTRATION_HOME}"
           echo "{ \"releases\": { \"default\": \"$MONGODB_BINARIES\" }}" > $MONGO_ORCHESTRATION_HOME/orchestration.config
 
   "bootstrap mongo-orchestration":
@@ -178,6 +180,19 @@ functions:
           SWIFT_VERSION=${SWIFT_VERSION} ATLAS_REPL='${ATLAS_REPL}' ATLAS_SHRD='${ATLAS_SHRD}' ATLAS_FREE='${ATLAS_FREE}' ATLAS_TLS11='${ATLAS_TLS11}' ATLAS_TLS12='${ATLAS_TLS12}' \
           ATLAS_REPL_SRV='${ATLAS_REPL_SRV}' ATLAS_SHRD_SRV='${ATLAS_SHRD_SRV}' ATLAS_FREE_SRV='${ATLAS_FREE_SRV}' ATLAS_TLS11_SRV='${ATLAS_TLS11_SRV}' ATLAS_TLS12_SRV='${ATLAS_TLS12_SRV}' \
           sh ${PROJECT_DIRECTORY}/.evergreen/run-atlas-tests.sh
+
+  "run serverless tests":
+    - command: shell.exec
+      type: test
+      params:
+        working_dir: "src"
+        script: |
+          ${PREPARE_SHELL}
+          set +o xtrace
+          MONGODB_URI="${MONGODB_URI}" \
+          MONGODB_SCRAM_USER="${SERVERLESS_ATLAS_USER}" \
+          MONGODB_SCRAM_PASSWORD="${SERVERLESS_ATLAS_PASSWORD}" \
+            sh ${PROJECT_DIRECTORY}/.evergreen/run-serverless-tests.sh
 
   "run ocsp test":
     - command: shell.exec
@@ -535,6 +550,11 @@ tasks:
       tags: ["atlas-connect"]
       commands:
         - func: "run atlas tests"
+
+    - name: "test-serverless"
+      tags: ["serverless"]
+      commands:
+        - func: "run serverless tests"
 
     - name: test-ocsp-rsa-valid-cert-server-staples
       tags: ["ocsp", "ocsp-rsa", "ocsp-staple"]
@@ -993,17 +1013,17 @@ axes:
         variables:
           SSL: "nossl"
           AUTH: "noauth"
-
+    
   - id: auth
     display_name: Auth
     values:
       - id: auth
         display_name: Auth
         variables:
-          AUTH: "auth"
+          AUTH: "auth"    
 
   - id: versionedAPI
-    display_name: API Version
+    display_name: Versioned API
     values:
     # Test against a cluster with requireApiVersion=1.
       - id: requireApiVersion1
@@ -1026,6 +1046,38 @@ axes:
         variables:
           ORCHESTRATION_FILE: "versioned-api-testing.json"
           TEST_FILTER: "VersionedAPITests"
+
+task_groups:
+  - name: serverless_task_group
+    setup_group_can_fail_task: true
+    setup_group_timeout_secs: 1800 # 30 minutes
+    setup_group:
+      - func: "fetch source"
+      - func: "install swift"
+      - func: "prepare resources"
+      - command: shell.exec
+        script: |
+          ${PREPARE_SHELL}
+          set +o xtrace
+          SERVERLESS_DRIVERS_GROUP=${SERVERLESS_DRIVERS_GROUP} \
+          SERVERLESS_API_PUBLIC_KEY=${SERVERLESS_API_PUBLIC_KEY} \
+          SERVERLESS_API_PRIVATE_KEY=${SERVERLESS_API_PRIVATE_KEY} \
+            bash ${DRIVERS_TOOLS}/.evergreen/serverless/create-instance.sh "${build_id}_${project}"
+      - command: expansions.update
+        params:
+          file: serverless-expansion.yml
+    teardown_group:
+      - command: shell.exec
+        script: |
+          ${PREPARE_SHELL}
+          set +o xtrace
+          SERVERLESS_DRIVERS_GROUP=${SERVERLESS_DRIVERS_GROUP} \
+          SERVERLESS_API_PUBLIC_KEY=${SERVERLESS_API_PUBLIC_KEY} \
+          SERVERLESS_API_PRIVATE_KEY=${SERVERLESS_API_PRIVATE_KEY} \
+            bash ${DRIVERS_TOOLS}/.evergreen/serverless/delete-instance.sh "${build_id}_${project}"
+    tasks:
+      - ".serverless"
+>>>>>>> serverless try 5 with explicit var pass
 
 buildvariants:
 
@@ -1064,6 +1116,16 @@ buildvariants:
   tasks:
     - ".atlas-connect"
 
+- matrix_name: "serverless"
+  matrix_spec:
+    os-fully-featured:
+      - "ubuntu-18.04"
+    swift-version:
+      - 5.2
+  display_name: "Serverless ${swift-version} ${os-fully-featured}"
+  tasks:
+    - "serverless_task_group"
+
 - matrix_name: "ocsp"
   matrix_spec:
     os-fully-featured:
@@ -1098,6 +1160,7 @@ buildvariants:
   matrix_spec:
     os-fully-featured: ubuntu-18.04
     swift-version: "5.3"
+    auth: "auth"
     versionedAPI: "*"
   display_name: "Versioned API ${versionedAPI} ${swift-version} ${os-fully-featured}"
   batchtime: 10080  # 7 days
