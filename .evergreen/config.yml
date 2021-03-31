@@ -1057,6 +1057,7 @@ task_groups:
           SERVERLESS_API_PUBLIC_KEY=${SERVERLESS_API_PUBLIC_KEY} \
           SERVERLESS_API_PRIVATE_KEY=${SERVERLESS_API_PRIVATE_KEY} \
             bash ${DRIVERS_TOOLS}/.evergreen/serverless/create-instance.sh "${build_id}_${project}"
+          ls
       - command: expansions.update
         params:
           file: serverless-expansion.yml
