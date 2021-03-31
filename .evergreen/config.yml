@@ -1056,26 +1056,29 @@ task_groups:
       - func: "install swift"
       - func: "prepare resources"
       - command: shell.exec
-        script: |
-          ${PREPARE_SHELL}
-          set +o xtrace
-          SERVERLESS_DRIVERS_GROUP=${SERVERLESS_DRIVERS_GROUP} \
-          SERVERLESS_API_PUBLIC_KEY=${SERVERLESS_API_PUBLIC_KEY} \
-          SERVERLESS_API_PRIVATE_KEY=${SERVERLESS_API_PRIVATE_KEY} \
-            bash ${DRIVERS_TOOLS}/.evergreen/serverless/create-instance.sh "${build_id}_${project}"
-          ls
+        params:
+          script: |
+            ${PREPARE_SHELL}
+            set +o xtrace
+            ls
+            SERVERLESS_DRIVERS_GROUP=${SERVERLESS_DRIVERS_GROUP} \
+            SERVERLESS_API_PUBLIC_KEY=${SERVERLESS_API_PUBLIC_KEY} \
+            SERVERLESS_API_PRIVATE_KEY=${SERVERLESS_API_PRIVATE_KEY} \
+              bash ${DRIVERS_TOOLS}/.evergreen/serverless/create-instance.sh "${build_id}_${project}"
+            ls
       - command: expansions.update
         params:
           file: serverless-expansion.yml
     teardown_group:
       - command: shell.exec
-        script: |
-          ${PREPARE_SHELL}
-          set +o xtrace
-          SERVERLESS_DRIVERS_GROUP=${SERVERLESS_DRIVERS_GROUP} \
-          SERVERLESS_API_PUBLIC_KEY=${SERVERLESS_API_PUBLIC_KEY} \
-          SERVERLESS_API_PRIVATE_KEY=${SERVERLESS_API_PRIVATE_KEY} \
-            bash ${DRIVERS_TOOLS}/.evergreen/serverless/delete-instance.sh "${build_id}_${project}"
+        params:
+          script: |
+            ${PREPARE_SHELL}
+            set +o xtrace
+            SERVERLESS_DRIVERS_GROUP=${SERVERLESS_DRIVERS_GROUP} \
+            SERVERLESS_API_PUBLIC_KEY=${SERVERLESS_API_PUBLIC_KEY} \
+            SERVERLESS_API_PRIVATE_KEY=${SERVERLESS_API_PRIVATE_KEY} \
+              bash ${DRIVERS_TOOLS}/.evergreen/serverless/delete-instance.sh "${build_id}_${project}"
     tasks:
       - ".serverless"
 >>>>>>> serverless try 5 with explicit var pass
