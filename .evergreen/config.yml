@@ -1051,6 +1051,7 @@ task_groups:
       - func: "prepare resources"
       - command: shell.exec
         params:
+          shell: "bash"
           script: |
             ${PREPARE_SHELL}
             set +o xtrace
