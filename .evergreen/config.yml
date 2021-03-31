@@ -1066,12 +1066,10 @@ task_groups:
           script: |
             ${PREPARE_SHELL}
             set +o xtrace
-            ls
             SERVERLESS_DRIVERS_GROUP=${SERVERLESS_DRIVERS_GROUP} \
             SERVERLESS_API_PUBLIC_KEY=${SERVERLESS_API_PUBLIC_KEY} \
             SERVERLESS_API_PRIVATE_KEY=${SERVERLESS_API_PRIVATE_KEY} \
-              bash ${DRIVERS_TOOLS}/.evergreen/serverless/create-instance.sh "${build_id}_${project}"
-            ls
+              bash ${DRIVERS_TOOLS}/.evergreen/serverless/create-instance.sh "${RANDOM}-${project}"
       - command: expansions.update
         params:
           file: serverless-expansion.yml
@@ -1084,7 +1082,7 @@ task_groups:
             SERVERLESS_DRIVERS_GROUP=${SERVERLESS_DRIVERS_GROUP} \
             SERVERLESS_API_PUBLIC_KEY=${SERVERLESS_API_PUBLIC_KEY} \
             SERVERLESS_API_PRIVATE_KEY=${SERVERLESS_API_PRIVATE_KEY} \
-              bash ${DRIVERS_TOOLS}/.evergreen/serverless/delete-instance.sh "${build_id}_${project}"
+              bash ${DRIVERS_TOOLS}/.evergreen/serverless/delete-instance.sh "${SERVERLESS_INSTANCE_NAME}"
     tasks:
       - ".serverless"
 
