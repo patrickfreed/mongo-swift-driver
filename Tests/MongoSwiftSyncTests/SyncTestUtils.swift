@@ -134,7 +134,7 @@ extension MongoClient {
 
         if MongoSwiftTestCase.auth {
             if let scramUser = MongoSwiftTestCase.scramUser, let scramPass = MongoSwiftTestCase.scramPassword {
-                opts.credential = MongoCredential(username: scramUser, password: scramPass, mechanism: .scramSHA256)
+                opts.credential = MongoCredential(username: scramUser, password: scramPass)
             }
         }
         return try MongoClient(uri, options: opts)
