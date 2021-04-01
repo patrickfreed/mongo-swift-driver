@@ -149,6 +149,10 @@ open class MongoSwiftTestCase: XCTestCase {
         }
         return MongoServerAPI.Version(versionString)
     }
+
+    public static var serverless: Bool {
+        ProcessInfo.processInfo.environment["SERVERLESS"] == "serverless"
+    }
 }
 
 /// Enumerates the different topology configurations that are used throughout the tests
@@ -177,7 +181,8 @@ public enum TestTopologyConfiguration: String, Decodable {
         {
             self = .single
         } else if isMasterReply["msg"] == "isdbgrid" {
-            guard !shards.isEmpty else {
+            // Serverless proxy reports as a mongos but presents no shards
+            guard !shards.isEmpty || MongoSwiftTestCase.serverless else {
                 throw TestError(
                     message: "isMasterReply \(isMasterReply) implies a sharded cluster, but config.shards is empty"
                 )
