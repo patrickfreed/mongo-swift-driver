@@ -189,9 +189,12 @@ functions:
         script: |
           ${PREPARE_SHELL}
           set +o xtrace
+
           MONGODB_URI="${MONGODB_URI}" \
+          MONGODB_API_VERSION=${MONGODB_API_VERSION} \
           SERVERLESS_ATLAS_USER="${SERVERLESS_ATLAS_USER}" \
           SERVERLESS_ATLAS_PASSWORD="${SERVERLESS_ATLAS_PASSWORD}" \
+          SWIFT_VERSION="${SWIFT_VERSION}" \
             sh ${PROJECT_DIRECTORY}/.evergreen/run-serverless-tests.sh
 
   "run ocsp test":
