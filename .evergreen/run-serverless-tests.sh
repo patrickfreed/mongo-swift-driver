@@ -7,8 +7,6 @@ PROJECT_DIRECTORY=${PROJECT_DIRECTORY:-$PWD}
 SWIFT_VERSION=${SWIFT_VERSION:-5.2.5}
 INSTALL_DIR="${PROJECT_DIRECTORY}/opt"
 OS=$(uname -s | tr '[:upper:]' '[:lower:]')
-RAW_TEST_RESULTS="${PROJECT_DIRECTORY}/rawTestResults"
-XML_TEST_RESULTS="${PROJECT_DIRECTORY}/testResults.xml"
 INSTALL_DEPS=${INSTALL_DEPS:-"false"}
 
 # if dependencies were not installed separately, do so now.
@@ -34,25 +32,12 @@ swiftenv local $SWIFT_VERSION
 # build the driver
 swift build
 
-# test the driver
-# set +o errexit # even if tests fail we want to parse the results, so disable errexit
-# set -o pipefail # propagate error codes in the following pipes
-
-MONGODB_TOPOLOGY="sharded" \
+MONGODB_TOPOLOGY="sharded_cluster" \
   MONGODB_URI=${MONGODB_URI} \
   SERVERLESS="serverless" \
-  MONGODB_API_VERSION=1 \
+  MONGODB_API_VERSION=${MONGODB_API_VERSION} \
   MONGODB_SCRAM_USER=${SERVERLESS_ATLAS_USER} \
   MONGODB_SCRAM_PASSWORD=${SERVERLESS_ATLAS_PASSWORD} \
   AUTH="auth" \
   SSL="ssl" \
     swift test --filter="Crud"
-
-# save tests exit code
-EXIT_CODE=$?
-
-# convert tests to XML
-# cat ${RAW_TEST_RESULTS} | swift "${PROJECT_DIRECTORY}/etc/convert-test-results.swift" > ${XML_TEST_RESULTS}
-
-# exit with exit code for running the tests
-exit $EXIT_CODE
