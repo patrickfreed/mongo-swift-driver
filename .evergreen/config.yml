@@ -190,8 +190,8 @@ functions:
           ${PREPARE_SHELL}
           set +o xtrace
           MONGODB_URI="${MONGODB_URI}" \
-          MONGODB_SCRAM_USER="${SERVERLESS_ATLAS_USER}" \
-          MONGODB_SCRAM_PASSWORD="${SERVERLESS_ATLAS_PASSWORD}" \
+          SERVERLESS_ATLAS_USER="${SERVERLESS_ATLAS_USER}" \
+          SERVERLESS_ATLAS_PASSWORD="${SERVERLESS_ATLAS_PASSWORD}" \
             sh ${PROJECT_DIRECTORY}/.evergreen/run-serverless-tests.sh
 
   "run ocsp test":

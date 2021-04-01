@@ -4,14 +4,8 @@ set -o errexit  # Exit the script with error if any of the commands fail
 
 # variables
 PROJECT_DIRECTORY=${PROJECT_DIRECTORY:-$PWD}
-MONGODB_URI=${MONGODB_URI:-"NO_URI_PROVIDED"}
 SWIFT_VERSION=${SWIFT_VERSION:-5.2.5}
 INSTALL_DIR="${PROJECT_DIRECTORY}/opt"
-TOPOLOGY=sharded_cluster
-SSL=ssl
-AUTH=auth
-MONGODB_API_VERSION=1
-SERVERLESS=serverless
 OS=$(uname -s | tr '[:upper:]' '[:lower:]')
 RAW_TEST_RESULTS="${PROJECT_DIRECTORY}/rawTestResults"
 XML_TEST_RESULTS="${PROJECT_DIRECTORY}/testResults.xml"
@@ -44,12 +38,14 @@ swift build
 # set +o errexit # even if tests fail we want to parse the results, so disable errexit
 # set -o pipefail # propagate error codes in the following pipes
 
-MONGODB_TOPOLOGY=${TOPOLOGY} \
+MONGODB_TOPOLOGY="sharded" \
   MONGODB_URI=${MONGODB_URI} \
-  SERVERLESS=${SERVERLESS} \
-  MONGODB_API_VERSION=${MONGODB_API_VERSION} \
-  MONGODB_SCRAM_USER=${MONGODB_SCRAM_USER} \
-  MONGODB_SCRAM_PASSWORD=${MONGODB_SCRAM_PASSWORD} \
+  SERVERLESS="serverless" \
+  MONGODB_API_VERSION=1 \
+  MONGODB_SCRAM_USER=${SERVERLESS_ATLAS_USER} \
+  MONGODB_SCRAM_PASSWORD=${SERVERLESS_ATLAS_PASSWORD} \
+  AUTH="auth" \
+  SSL="ssl" \
     swift test --filter="Crud"
 
 # save tests exit code
