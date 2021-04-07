@@ -9,7 +9,7 @@ struct UnifiedTestRunner {
     let serverParameters: BSONDocument
 
     static let minSchemaVersion = SchemaVersion(rawValue: "1.0.0")!
-    static let maxSchemaVersion = SchemaVersion(rawValue: "1.1.0")!
+    static let maxSchemaVersion = SchemaVersion(rawValue: "1.3.0")!
 
     init() throws {
         let connStr = MongoSwiftTestCase.getConnectionString(singleMongos: false).toString()
