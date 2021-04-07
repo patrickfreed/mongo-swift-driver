@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -o errexit  # Exit the script with error if any of the commands fail
+set +o xtrace   # disable xtrace to avoid leaking credentials
 
 # variables
 PROJECT_DIRECTORY=${PROJECT_DIRECTORY:-$PWD}
