@@ -16,7 +16,7 @@ struct UnifiedTestRunner {
         self.internalClient = try MongoClient.makeTestClient(connStr)
         self.serverVersion = try self.internalClient.serverVersion()
         self.topologyType = try self.internalClient.topologyType()
-        self.serverParameters = try self.internalClient.serverParameters()
+        self.serverParameters = (try? self.internalClient.serverParameters()) ?? [:]
 
         // The test runner SHOULD terminate any open transactions using the internal MongoClient before executing any
         // tests.
@@ -24,6 +24,10 @@ struct UnifiedTestRunner {
     }
 
     func terminateOpenTransactions() throws {
+        guard !MongoSwiftTestCase.serverless else {
+            // Serverless does not allow killAllSessions currently
+            return
+        }
         // Using the internal MongoClient, execute the killAllSessions command on either the primary or, if
         // connected to a sharded cluster, all mongos servers.
         switch self.topologyType {

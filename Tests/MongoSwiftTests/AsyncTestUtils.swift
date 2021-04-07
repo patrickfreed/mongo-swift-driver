@@ -12,12 +12,13 @@ extension MongoClient {
     ) throws -> MongoClient {
         var opts = options ?? MongoClientOptions()
         // if SSL is on and custom TLS options were not provided, enable them
-        if MongoSwiftTestCase.ssl && opts.tlsCAFile == nil && opts.tlsCertificateKeyFile == nil {
+        if MongoSwiftTestCase.ssl {
+            opts.tls = true
             if let caPath = MongoSwiftTestCase.sslCAFilePath {
                 opts.tlsCAFile = URL(string: caPath)
             }
-            if let keyPath = MongoSwiftTestCase.sslPEMKeyFilePath {
-                opts.tlsCertificateKeyFile = URL(string: keyPath)
+            if let certPath = MongoSwiftTestCase.sslPEMKeyFilePath {
+                opts.tlsCertificateKeyFile = URL(string: certPath)
             }
         }
         if let apiVersion = MongoSwiftTestCase.apiVersion {
@@ -25,6 +26,12 @@ extension MongoClient {
                 opts.serverAPI = MongoServerAPI(version: apiVersion)
             } else {
                 opts.serverAPI!.version = apiVersion
+            }
+        }
+
+        if MongoSwiftTestCase.auth {
+            if let scramUser = MongoSwiftTestCase.scramUser, let scramPass = MongoSwiftTestCase.scramPassword {
+                opts.credential = MongoCredential(username: scramUser, password: scramPass)
             }
         }
         return try MongoClient(uri, using: eventLoopGroup, options: opts)
@@ -60,7 +67,7 @@ extension MongoClient {
         let shards = try self.db("config").collection("shards").find().wait().toArray().wait()
         let topologyType = try TestTopologyConfiguration(isMasterReply: isMasterReply, shards: shards)
         let serverVersion = try self.serverVersion().wait()
-        let params = try self.serverParameters().wait()
+        let params = (try? self.serverParameters().wait()) ?? [:]
         return testRequirement.getUnmetRequirement(givenCurrent: serverVersion, topologyType, params)
     }
 }

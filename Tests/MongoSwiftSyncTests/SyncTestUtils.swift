@@ -81,7 +81,7 @@ extension MongoClient {
     internal func getUnmetRequirement(_ testRequirement: TestRequirement) throws -> UnmetRequirement? {
         let topologyType = try self.topologyType()
         let serverVersion = try self.serverVersion()
-        let params = try self.serverParameters()
+        let params = (try? self.serverParameters()) ?? [:]
         return testRequirement.getUnmetRequirement(givenCurrent: serverVersion, topologyType, params)
     }
 
