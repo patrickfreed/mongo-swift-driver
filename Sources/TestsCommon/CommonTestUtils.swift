@@ -292,22 +292,21 @@ public struct TestRequirement: Decodable {
                 return .topology(actual: topology, required: topologies)
             }
 
-            if let serverlessMode = self.serverlessMode {
-                switch serverlessMode {
-                case .allowServerless:
-                    break
-                case .forbidServerless:
-                    guard !MongoSwiftTestCase.serverless else {
-                        return .serverless(required: serverlessMode)
-                    }
-                case .requireServerless:
-                    guard MongoSwiftTestCase.serverless else {
-                        return .serverless(required: serverlessMode)
-                    }
+            return nil
+        }
+        if let serverlessMode = self.serverlessMode {
+            switch serverlessMode {
+            case .allowServerless:
+                break
+            case .forbidServerless:
+                guard !MongoSwiftTestCase.serverless else {
+                    return .serverless(required: serverlessMode)
+                }
+            case .requireServerless:
+                guard MongoSwiftTestCase.serverless else {
+                    return .serverless(required: serverlessMode)
                 }
             }
-
-            return nil
         }
         if let expectedParameters = self.serverParameters {
             for (expectedParam, expectedValue) in expectedParameters {
