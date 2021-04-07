@@ -42,3 +42,13 @@ MONGODB_TOPOLOGY="sharded_cluster" \
   AUTH="auth" \
   SSL="ssl" \
     swift test --filter="Crud"
+
+MONGODB_TOPOLOGY="sharded_cluster" \
+  MONGODB_URI=${MONGODB_URI} \
+  SERVERLESS="serverless" \
+  MONGODB_API_VERSION=${MONGODB_API_VERSION} \
+  MONGODB_SCRAM_USER=${SERVERLESS_ATLAS_USER} \
+  MONGODB_SCRAM_PASSWORD=${SERVERLESS_ATLAS_PASSWORD} \
+  AUTH="auth" \
+  SSL="ssl" \
+    swift test --filter="testCursorId"
