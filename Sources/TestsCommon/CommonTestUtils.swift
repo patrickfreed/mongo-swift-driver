@@ -219,22 +219,22 @@ public enum UnmetRequirement {
     case maxServerVersion(actual: ServerVersion, required: ServerVersion)
     case topology(actual: TestTopologyConfiguration, required: [TestTopologyConfiguration])
     case serverParameter(name: String, actual: BSON?, required: BSON)
-    case serverless(required: TestRequirement.ServerlessMode)
+    case serverless(required: TestRequirement.ServerlessRequirement)
 }
 
 /// Struct representing conditions that a deployment must meet in order for a test file to be run.
 public struct TestRequirement: Decodable {
-    public enum ServerlessMode: String, Decodable {
-        case requireServerless
-        case forbidServerless
-        case allowServerless
+    public enum ServerlessRequirement: String, Decodable {
+        case require
+        case forbid
+        case allow
     }
 
     private let minServerVersion: ServerVersion?
     private let maxServerVersion: ServerVersion?
     private let topologies: [TestTopologyConfiguration]?
     private let serverParameters: BSONDocument?
-    private let serverlessMode: ServerlessMode?
+    private let serverless: ServerlessRequirement?
 
     public static let failCommandSupport: [TestRequirement] = [
         TestRequirement(
@@ -257,14 +257,14 @@ public struct TestRequirement: Decodable {
         minServerVersion: ServerVersion? = nil,
         maxServerVersion: ServerVersion? = nil,
         acceptableTopologies: [TestTopologyConfiguration]? = nil,
-        serverlessMode: ServerlessMode? = nil,
+        serverlessRequirement: ServerlessRequirement? = nil,
         serverParameters: BSONDocument? = nil
     ) {
         self.minServerVersion = minServerVersion
         self.maxServerVersion = maxServerVersion
         self.topologies = acceptableTopologies
         self.serverParameters = serverParameters
-        self.serverlessMode = serverlessMode
+        self.serverless = serverlessRequirement
     }
 
     /// Determines if the given deployment meets this requirement.
@@ -292,23 +292,24 @@ public struct TestRequirement: Decodable {
                 return .topology(actual: topology, required: topologies)
             }
 
-            if let serverlessMode = self.serverlessMode {
-                switch serverlessMode {
-                case .allowServerless:
-                    break
-                case .forbidServerless:
-                    guard !MongoSwiftTestCase.serverless else {
-                        return .serverless(required: serverlessMode)
-                    }
-                case .requireServerless:
-                    guard MongoSwiftTestCase.serverless else {
-                        return .serverless(required: serverlessMode)
-                    }
-                }
-            }
-
             return nil
         }
+
+        if let serverlessRequirement = self.serverless {
+            switch serverlessRequirement {
+            case .allow:
+                break
+            case .forbid:
+                guard !MongoSwiftTestCase.serverless else {
+                    return .serverless(required: serverlessRequirement)
+                }
+            case .require:
+                guard MongoSwiftTestCase.serverless else {
+                    return .serverless(required: serverlessRequirement)
+                }
+            }
+        }
+
         if let expectedParameters = self.serverParameters {
             for (expectedParam, expectedValue) in expectedParameters {
                 guard let actualValue = serverParameters[expectedParam] else {
@@ -334,7 +335,7 @@ public struct TestRequirement: Decodable {
     }
 
     private enum CodingKeys: String, CodingKey {
-        case minServerVersion, maxServerVersion, topology, topologies, serverlessMode, serverParameters
+        case minServerVersion, maxServerVersion, topology, topologies, serverless, serverParameters
     }
 
     public init(from decoder: Decoder) throws {
@@ -350,7 +351,7 @@ public struct TestRequirement: Decodable {
             self.topologies = nil
         }
         self.serverParameters = try container.decodeIfPresent(BSONDocument.self, forKey: .serverParameters)
-        self.serverlessMode = try container.decodeIfPresent(ServerlessMode.self, forKey: .serverlessMode)
+        self.serverless = try container.decodeIfPresent(ServerlessRequirement.self, forKey: .serverless)
     }
 }
 
@@ -454,11 +455,11 @@ public func printSkipMessage(
         reason = "required value for server parameter \(name) is \(required), but actual is \(actual ?? "nil")"
     case let .serverless(required):
         switch required {
-        case .allowServerless:
+        case .allow:
             fatalError("allowServerless should not cause a test to be skipped")
-        case .forbidServerless:
+        case .forbid:
             reason = "this test is not supported by Serverless"
-        case .requireServerless:
+        case .require:
             reason = "this test must be run against a Serverless instance"
         }
     }
