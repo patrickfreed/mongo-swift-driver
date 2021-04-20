@@ -45,7 +45,8 @@ private struct RetryableReadsTestFile: Decodable, SpecTestFile {
         "gridfs",
         "count.",
         "count-",
-        "mapReduce"
+        "mapReduce",
+        "changeStream"
     ]
 }
 
