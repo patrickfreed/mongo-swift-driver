@@ -145,6 +145,11 @@ extension MongoClient {
                 opts.serverAPI!.version = apiVersion
             }
         }
+
+        if MongoSwiftTestCase.serverless {
+            opts.compressors = [.zlib]
+        }
+
         return try MongoClient(uri, options: opts)
     }
 
