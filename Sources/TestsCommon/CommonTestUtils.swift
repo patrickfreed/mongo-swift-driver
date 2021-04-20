@@ -291,8 +291,6 @@ public struct TestRequirement: Decodable {
             else {
                 return .topology(actual: topology, required: topologies)
             }
-
-            return nil
         }
 
         if let serverlessRequirement = self.serverless {
