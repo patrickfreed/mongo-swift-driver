@@ -5,7 +5,7 @@
       "topology": [
         "sharded"
       ],
-      "serverlessMode": "forbidServerless"
+      "serverless": "forbid"
     }
   ],
   "database_name": "transaction-tests",
