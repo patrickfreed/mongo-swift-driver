@@ -7,7 +7,7 @@
       "serverParameters": {
         "enableTestCommands": true
       },
-        "serverless": "forbid"
+      "serverless": "forbid"
     }
   ],
   "createEntities": [
