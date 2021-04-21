@@ -71,17 +71,6 @@ final class CrudTests: MongoSwiftTestCase {
         let runner = try UnifiedTestRunner()
         try runner.runFiles(files.map { $0.1 })
     }
-
-    func testUnifiedCrud() throws {
-        let files = try retrieveSpecTestFiles(
-            specName: "crud",
-            subdirectory: "unified",
-            asType: UnifiedTestFile.self
-        ).map { $0.1 }
-
-        let runner = try UnifiedTestRunner()
-        try runner.runFiles(files)
-    }
 }
 
 /// A container for the data from a single .json file.
