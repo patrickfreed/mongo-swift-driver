@@ -46,7 +46,6 @@ private struct RetryableReadsTestFile: Decodable, SpecTestFile {
         "count.",
         "count-",
         "mapReduce",
-        "changeStream"
     ]
 }
 
