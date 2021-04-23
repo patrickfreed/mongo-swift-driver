@@ -54,14 +54,6 @@
         {
           "_id": 6,
           "x": 66
-        },
-        {
-          "_id": 7,
-          "x": 77
-        },
-        {
-          "_id": 8,
-          "x": 88
         }
       ]
     }
@@ -101,14 +93,6 @@
             {
               "_id": 6,
               "x": 66
-            },
-            {
-              "_id": 7,
-              "x": 77
-            },
-            {
-              "_id": 8,
-              "x": 88
             }
           ]
         }
@@ -125,7 +109,8 @@
                     "_id": {
                       "$gt": 1
                     }
-                  }
+                  },
+                  "batchSize": 2
                 },
                 "commandName": "find",
                 "databaseName": "find-tests"
@@ -135,7 +120,10 @@
               "commandStartedEvent": {
                 "command": {
                   "getMore": {
-                    "$$exists": true
+                    "$$type": [
+                      "int",
+                      "long"
+                    ]
                   },
                   "collection": "coll0",
                   "batchSize": 2
@@ -148,20 +136,10 @@
               "commandStartedEvent": {
                 "command": {
                   "getMore": {
-                    "$$exists": true
-                  },
-                  "collection": "coll0",
-                  "batchSize": 2
-                },
-                "commandName": "getMore",
-                "databaseName": "find-tests"
-              }
-            },
-            {
-              "commandStartedEvent": {
-                "command": {
-                  "getMore": {
-                    "$$exists": true
+                    "$$type": [
+                      "int",
+                      "long"
+                    ]
                   },
                   "collection": "coll0",
                   "batchSize": 2
