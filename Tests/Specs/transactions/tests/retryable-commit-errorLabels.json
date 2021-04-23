@@ -5,8 +5,7 @@
       "topology": [
         "replicaset",
         "sharded"
-      ],
-        "serverlessMode": "forbidServerless"
+      ]
     }
   ],
   "database_name": "transaction-tests",
