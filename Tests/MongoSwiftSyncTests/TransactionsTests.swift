@@ -66,8 +66,7 @@ final class TransactionsTests: MongoSwiftTestCase {
 
     func testTransactionsLegacy() throws {
         let tests = try retrieveSpecTestFiles(specName: "transactions", subdirectory: "legacy", asType: TransactionsTestFile.self)
-        for (name, testFile) in tests {
-            guard name == "retryable-commit.json" else { continue }
+        for (_, testFile) in tests {
             try testFile.runTests()
         }
     }
