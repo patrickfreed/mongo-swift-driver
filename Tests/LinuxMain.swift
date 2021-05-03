@@ -361,7 +361,8 @@ extension SyncMongoClientTests {
 
 extension TransactionsTests {
     static var allTests = [
-        ("testTransactions", testTransactions),
+        ("testTransactionsLegacy", testTransactionsLegacy),
+        ("testTransactionsUnified", testTransactionsUnified),
     ]
 }
 

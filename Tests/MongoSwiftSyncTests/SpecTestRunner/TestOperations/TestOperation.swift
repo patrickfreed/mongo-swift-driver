@@ -167,6 +167,7 @@ struct TestOperationDescription: Decodable {
             }
         } catch {
             if case let .error(expectedErrorResult) = self.result {
+                print("got expected error result: \(expectedErrorResult)")
                 expectedErrorResult.checkErrorResult(error, description: test.description)
             } else {
                 expect(self.error ?? false).to(beTrue(), description: "expected no error, got \(error)")

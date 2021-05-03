@@ -232,6 +232,7 @@ struct ErrorResult: Equatable, Decodable {
 
     private func checkErrorLabels(_ error: Error, description: String) {
         if let errorLabelsContain = self.errorLabelsContain {
+            print("got error labels contain: \(errorLabelsContain)")
             guard let labeledError = error as? MongoLabeledError else {
                 XCTFail("\(description): \(error) does not contain errorLabels")
                 return

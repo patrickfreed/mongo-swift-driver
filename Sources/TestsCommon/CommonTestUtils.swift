@@ -528,6 +528,7 @@ extension MongoError.CommandError {
 extension MongoLabeledError {
     /// Returns whether this error or an error type contained by this error has the provided error label.
     public func hasErrorLabel(_ label: String) -> Bool {
+        print("checking for \"\(label)\" in \(self.errorLabels ?? [])")
         if self.errorLabels?.contains(label) == true {
             return true
         }

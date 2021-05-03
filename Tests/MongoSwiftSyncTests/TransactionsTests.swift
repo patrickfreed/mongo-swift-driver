@@ -30,9 +30,9 @@ private struct TransactionsTest: SpecTest {
 
     static let skippedTestKeywords: [String] = [
         // TODO: SWIFT-762 the following 3 require libmongoc v1.17
-        "RetryableWriteError",
-        "commitTransaction fails after two errors",
-        "commitTransaction applies majority write concern on retries"
+        // "RetryableWriteError",
+        // "commitTransaction fails after two errors",
+        // "commitTransaction applies majority write concern on retries"
     ]
 }
 
@@ -64,10 +64,21 @@ final class TransactionsTests: MongoSwiftTestCase {
         self.continueAfterFailure = false
     }
 
-    func testTransactions() throws {
-        let tests = try retrieveSpecTestFiles(specName: "transactions", asType: TransactionsTestFile.self)
-        for (_, testFile) in tests {
+    func testTransactionsLegacy() throws {
+        let tests = try retrieveSpecTestFiles(specName: "transactions", subdirectory: "legacy", asType: TransactionsTestFile.self)
+        for (name, testFile) in tests {
+            guard name == "retryable-commit.json" else { continue }
             try testFile.runTests()
         }
+    }
+
+    func testTransactionsUnified() throws {
+        let files = try retrieveSpecTestFiles(specName: "transactions", subdirectory: "unified", asType: UnifiedTestFile.self)
+        let runner = try UnifiedTestRunner()
+        let skipList = [
+            // Blocked on libmongoc (CDRIVER-3949)
+            "mongos-unpin": ["unpin on successful abort"]
+        ]
+        try runner.runFiles(files.map { $0.1 })
     }
 }
