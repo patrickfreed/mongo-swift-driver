@@ -75,9 +75,9 @@ final class TransactionsTests: MongoSwiftTestCase {
         let files = try retrieveSpecTestFiles(specName: "transactions", subdirectory: "unified", asType: UnifiedTestFile.self)
         let runner = try UnifiedTestRunner()
         let skipList = [
-            // Blocked on libmongoc (CDRIVER-3949)
+            // TODO: SWIFT-1175 unskip this test
             "mongos-unpin": ["unpin on successful abort"]
         ]
-        try runner.runFiles(files.map { $0.1 })
+        try runner.runFiles(files.map { $0.1 }, skipTests: skipList)
     }
 }
