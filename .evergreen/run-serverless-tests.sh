@@ -40,4 +40,4 @@ MONGODB_TOPOLOGY="sharded_cluster" \
   MONGODB_SCRAM_PASSWORD=${SERVERLESS_ATLAS_PASSWORD} \
   AUTH="auth" \
   SSL="ssl" \
-    swift test --filter="(Crud|Retryable|Transactions|Versioned|Session)"
+    swift test --filter="(Crud)"
