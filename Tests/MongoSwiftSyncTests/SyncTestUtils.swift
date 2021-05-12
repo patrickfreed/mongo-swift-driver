@@ -128,9 +128,6 @@ extension MongoClient {
                 opts.tlsCertificateKeyFile = URL(string: certPath)
             }
         }
-        if let apiVersion = MongoSwiftTestCase.apiVersion {
-            opts.serverAPI = MongoServerAPI(version: apiVersion)
-        }
 
         if MongoSwiftTestCase.auth {
             if let scramUser = MongoSwiftTestCase.scramUser, let scramPass = MongoSwiftTestCase.scramPassword {

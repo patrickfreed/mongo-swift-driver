@@ -535,10 +535,11 @@ extension MongoLabeledError {
 
         switch self {
         case let bulk as MongoError.BulkWriteError:
-            return bulk.writeConcernFailure?.errorLabels?.contains(label) ??
+            return bulk.writeConcernFailure?.errorLabels?.contains(label) == true ||
                 (bulk.otherError as? MongoLabeledError)?.hasErrorLabel(label) == true
         case let write as MongoError.WriteError:
-            return write.errorLabels?.contains(label) ?? write.writeConcernFailure?.errorLabels?.contains(label) == true
+            return write.errorLabels?.contains(label) == true ||
+                write.writeConcernFailure?.errorLabels?.contains(label) == true
         default:
             return false
         }
